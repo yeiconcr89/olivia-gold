@@ -21,14 +21,18 @@ export const prisma: PrismaClient<Prisma.PrismaClientOptions, 'query' | 'error' 
     { emit: 'event', level: 'info' },
     { emit: 'event', level: 'warn' },
   ],
-  datasourceUrl: process.env.DATABASE_URL,
+  datasourceUrl: process.env.NODE_ENV === 'production'
+    ? (process.env.DATABASE_URL?.includes('?')
+      ? `${process.env.DATABASE_URL}&sslmode=no-verify`
+      : `${process.env.DATABASE_URL}?sslmode=no-verify`)
+    : process.env.DATABASE_URL,
 });
 
 // Logging de queries en desarrollo con métricas
 if (process.env.NODE_ENV === 'development') {
   prisma.$on('query', (e: Prisma.QueryEvent) => {
     queryCount++;
-    
+
     if (e.duration > SLOW_QUERY_THRESHOLD) {
       slowQueryCount++;
       logger.warn('Slow Query Detected:', {
