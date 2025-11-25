@@ -30,10 +30,10 @@ const DEFAULT_OPTIONS: Required<CSRFOptions> = {
   sessionKey: 'csrfSecret',
   ignoreMethods: ['GET', 'HEAD', 'OPTIONS'],
   value: (req: Request) => {
-    return req.body?._csrf || 
-           req.query._csrf || 
-           req.headers['x-csrf-token'] ||
-           req.headers['x-xsrf-token'];
+    return req.body?._csrf ||
+      req.query._csrf ||
+      req.headers['x-csrf-token'] ||
+      req.headers['x-xsrf-token'];
   }
 };
 
@@ -59,21 +59,21 @@ function generateToken(secret: string, length: number): string {
  */
 function verifyToken(secret: string, token: string, length: number): boolean {
   if (!secret || !token) return false;
-  
+
   // Para tokens de duración limitada, verificar en ventana de tiempo
   const now = Date.now();
   const timeWindow = 3600000; // 1 hora
-  
+
   for (let i = 0; i < 5; i++) {
     const time = now - (i * 600000); // Verificar cada 10 minutos hacia atrás
     const expectedToken = crypto.createHash('sha256')
       .update(secret + Math.floor(time / 600000).toString())
       .digest('base64')
       .substring(0, length);
-    
+
     if (token === expectedToken) return true;
   }
-  
+
   return false;
 }
 
@@ -135,7 +135,7 @@ export function csrfProtection(options: CSRFOptions = {}) {
       req.csrfToken = () => {
         const secret = getSecret();
         const token = generateToken(secret, opts.tokenLength);
-        
+
         // Configurar cookie si está habilitado
         if (config.nodeEnv === 'production') {
           res.cookie(opts.cookieName, token, {
@@ -152,7 +152,7 @@ export function csrfProtection(options: CSRFOptions = {}) {
             maxAge: 3600000
           });
         }
-        
+
         return token;
       };
 
@@ -193,15 +193,20 @@ export function csrfTokenGenerator() {
  */
 export function getCsrfToken(req: Request, res: Response) {
   if (!req.csrfToken) {
-    return res.status(500).json({
-      error: 'CSRF protection not initialized'
+    // CSRF middleware está deshabilitado, devolver token dummy
+    logger.warn('CSRF protection not initialized - returning dummy token');
+    return res.json({
+      csrfToken: 'csrf-disabled',
+      timestamp: Date.now(),
+      enabled: false
     });
   }
 
   const token = req.csrfToken();
   res.json({
     csrfToken: token,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    enabled: true
   });
 }
 
