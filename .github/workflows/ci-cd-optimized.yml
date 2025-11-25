@@ -176,7 +176,7 @@ jobs:
 
     - name: Upload Coverage to Codecov
       if: matrix.test-group == 'unit'
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         directory: ./coverage
         flags: frontend
@@ -296,7 +296,7 @@ jobs:
 
     - name: Upload Backend Coverage
       if: matrix.test-group == 'unit'
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         directory: ./backend/coverage
         flags: backend
