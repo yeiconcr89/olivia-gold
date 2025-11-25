@@ -50,6 +50,8 @@ import newsletterRoutes from './routes/newsletter.routes';
 dotenv.config();
 
 const app = express();
+// Trust proxy is required for rate limiting behind a proxy (Railway, Vercel, etc.)
+app.set('trust proxy', 1);
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // ============================================================================
