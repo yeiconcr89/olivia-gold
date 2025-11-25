@@ -25,7 +25,7 @@ export const useTestimonials = (limit: number = 6): UseTestimonialsReturn => {
                 setLoading(true);
                 setError(null);
 
-                const response = await fetch(`http://localhost:3001/api/reviews/approved?limit=${limit}`);
+                const response = await fetch(`${API_CONFIG.ENDPOINTS.REVIEWS.LIST}/approved?limit=${limit}`);
 
                 if (!response.ok) {
                     throw new Error('Error al cargar testimonios');
