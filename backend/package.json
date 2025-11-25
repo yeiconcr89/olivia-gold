@@ -11,7 +11,7 @@
     "dev:clean": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
     "build": "tsc || true",
     "start": "node dist/server.js",
-    "deploy": "npx prisma migrate deploy && npx prisma db seed && node dist/server.js",
+    "deploy": "echo '🚀 Starting deployment...' && echo '📦 Running migrations...' && npx prisma migrate deploy && echo '✅ Migrations complete' && echo '🌱 Seeding database...' && npx prisma db seed && echo '✅ Seed complete' && echo '🚀 Starting server...' && node dist/server.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
