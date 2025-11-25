@@ -114,13 +114,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // CSRF Protection (después de sesión y antes de rutas)
-if (config.nodeEnv === 'production') {
-  app.use(csrfProtection());
-  app.use(csrfTokenGenerator());
-} else {
-  // En desarrollo, usar protección CSRF más permisiva para facilitar testing
-  console.log('⚠️  CSRF protection disabled in development mode');
-}
+// if (config.nodeEnv === 'production') {
+//   app.use(csrfProtection());
+//   app.use(csrfTokenGenerator());
+// } else {
+// En desarrollo, usar protección CSRF más permisiva para facilitar testing
+console.log('⚠️  CSRF protection disabled (temporary fix)');
+// }
 
 // Endpoint para obtener token CSRF
 app.get('/api/csrf-token', getCsrfToken);
