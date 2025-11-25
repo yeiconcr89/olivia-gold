@@ -131,6 +131,7 @@ export type ValidatedEnv = z.infer<typeof baseEnvSchema>;
 // Validar variables de entorno
 export function validateEnvironment(): ValidatedEnv {
   try {
+    console.log('🔍 Debug: Variables de entorno disponibles:', Object.keys(process.env).sort().join(', '));
     return baseEnvSchema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
