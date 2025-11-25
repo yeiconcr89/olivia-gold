@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User } from '../types';
 import { API_CONFIG, apiRequest } from '../config/api';
@@ -181,6 +182,7 @@ const RegisterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -193,11 +195,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) =
     setLoading(true);
     setError('');
     try {
-      const data = await apiRequest<{user: User, token: string}>(API_CONFIG.ENDPOINTS.AUTH.LOGIN, {
+      const data = await apiRequest<{ user: User, token: string }>(API_CONFIG.ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
       await login(data.user, data.token, 'email');
+
+      // Redirigir a admin si es admin/manager
+      if (data.user.role === 'ADMIN' || data.user.role === 'MANAGER') {
+        console.log('🎯 LoginModal - Admin user detected, redirecting to /admin');
+        navigate('/admin');
+      }
+
       onClose();
       onSuccess?.();
     } catch (err: unknown) {
@@ -211,7 +220,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) =
     setLoading(true);
     setError('');
     try {
-      const data = await apiRequest<{user: User, token: string}>(API_CONFIG.ENDPOINTS.AUTH.GOOGLE_VERIFY, {
+      const data = await apiRequest<{ user: User, token: string }>(API_CONFIG.ENDPOINTS.AUTH.GOOGLE_VERIFY, {
         method: 'POST',
         body: JSON.stringify({
           token: googleResponse.token,
@@ -220,8 +229,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) =
           googleId: googleResponse.googleId
         })
       });
-      
+
       await login(data.user, data.token, 'google');
+
+      // Redirigir a admin si es admin/manager
+      if (data.user.role === 'ADMIN' || data.user.role === 'MANAGER') {
+        console.log('🎯 LoginModal - Admin user detected (Google), redirecting to /admin');
+        navigate('/admin');
+      }
+
       onClose();
       onSuccess?.();
     } catch (err: unknown) {
@@ -272,7 +288,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) =
                 />
               </div>
               {error && <div className="text-red-600 text-sm">{error}</div>}
-              
+
               {/* Separador */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -285,7 +301,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) =
 
               {/* Google Login Button */}
               <div className="w-full">
-                <GoogleLoginButton 
+                <GoogleLoginButton
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}
                 />
