@@ -6,9 +6,9 @@ class RedisService {
   private isConnected = false;
 
   async connect(): Promise<void> {
-    // Skip connection if Redis is disabled
-    if (process.env.REDIS_ENABLED !== 'true') {
-      logger.info('Redis está deshabilitado por configuración');
+    // Skip connection if Redis is disabled or URL is missing
+    if (process.env.REDIS_ENABLED !== 'true' || !process.env.REDIS_URL) {
+      logger.info('Redis está deshabilitado o no configurado (usando memoria local)');
       return;
     }
 
@@ -265,22 +265,22 @@ class RedisService {
 
   static keys = {
     product: (id: string) => `product:${id}`,
-    products: (page: number, limit: number, filters?: string) => 
+    products: (page: number, limit: number, filters?: string) =>
       `products:${page}:${limit}${filters ? `:${filters}` : ''}`,
-    productsByCategory: (category: string, page: number, limit: number) => 
+    productsByCategory: (category: string, page: number, limit: number) =>
       `products:category:${category}:${page}:${limit}`,
-    search: (query: string, page: number, limit: number) => 
+    search: (query: string, page: number, limit: number) =>
       `search:${query}:${page}:${limit}`,
     popularProducts: () => 'products:popular',
     featuredProducts: () => 'products:featured',
     recentProducts: () => 'products:recent',
     user: (id: string) => `user:${id}`,
     userSession: (sessionId: string) => `session:${sessionId}`,
-    orders: (userId: string, page: number, limit: number) => 
+    orders: (userId: string, page: number, limit: number) =>
       `orders:${userId}:${page}:${limit}`,
     orderStats: (period: string) => `stats:orders:${period}`,
     inventory: (productId: string) => `inventory:${productId}`,
-    reviews: (productId: string, page: number, limit: number) => 
+    reviews: (productId: string, page: number, limit: number) =>
       `reviews:${productId}:${page}:${limit}`,
     reviewStats: (productId: string) => `reviews:stats:${productId}`,
   };
