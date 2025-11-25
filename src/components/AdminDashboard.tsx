@@ -65,6 +65,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Lista de tabs válidos
   const validTabs = useMemo(() => [
@@ -557,10 +558,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
               <h1 className="text-xl font-bold text-elegant-900">Panel de Administración</h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <span className="hidden md:block text-sm text-elegant-600 truncate max-w-32 lg:max-w-none">
-                {user?.profile?.name || user?.email}
-              </span>
-
               {/* DevRoleSwitch integrado en el header del admin - Solo en desarrollo */}
               {!import.meta.env.PROD && (
                 <DevRoleSwitch
@@ -568,17 +565,83 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
                 />
               )}
 
-              <button
-                onClick={() => {
-                  if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                    logout();
-                  }
-                }}
-                className="inline-flex items-center px-2 py-1.5 sm:px-3 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Cerrar Sesión</span>
-              </button>
+              {/* User Dropdown Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-elegant-100 transition-colors"
+                >
+                  {/* Avatar */}
+                  <div className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-elegant-900 font-bold text-sm">
+                    {user?.profile?.name?.charAt(0) || user?.email?.charAt(0) || 'A'}
+                  </div>
+
+                  {/* User Info - Hidden on mobile */}
+                  <div className="hidden md:block text-left">
+                    <p className="text-sm font-medium text-elegant-900">
+                      {user?.profile?.name || user?.email}
+                    </p>
+                    <p className="text-xs text-elegant-500">
+                      {user?.role === 'ADMIN' ? 'Administrador' : 'Manager'}
+                    </p>
+                  </div>
+
+                  {/* Dropdown Arrow */}
+                  <svg
+                    className={`w-4 h-4 text-elegant-600 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <>
+                    {/* Backdrop para cerrar al hacer click fuera */}
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+
+                    {/* Menu */}
+                    <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                      <div className="py-1" role="menu">
+                        {/* User Info - Visible on mobile in dropdown */}
+                        <div className="md:hidden px-4 py-3 border-b border-elegant-200">
+                          <p className="text-sm font-medium text-elegant-900">
+                            {user?.profile?.name || user?.email}
+                          </p>
+                          <p className="text-xs text-elegant-500 mt-1">
+                            {user?.email}
+                          </p>
+                          <span className="inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full bg-gold-100 text-gold-800">
+                            {user?.role === 'ADMIN' ? 'Administrador' : 'Manager'}
+                          </span>
+                        </div>
+
+                        {/* Logout Button */}
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                              logout();
+                              navigate('/');
+                            }
+                          }}
+                          className="w-full text-left px-4 py-3 text-sm text-red-700 hover:bg-red-50 flex items-center space-x-2 transition-colors"
+                          role="menuitem"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Cerrar Sesión</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
