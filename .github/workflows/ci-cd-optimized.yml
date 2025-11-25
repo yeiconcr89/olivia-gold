@@ -123,7 +123,7 @@ jobs:
 
     - name: Restore Dependencies Cache
       id: cache-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -231,7 +231,7 @@ jobs:
 
     - name: Restore Backend Dependencies Cache
       id: cache-backend-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           backend/node_modules
@@ -248,7 +248,7 @@ jobs:
         echo "✅ Backend dependencies installed" >> $GITHUB_STEP_SUMMARY
 
     - name: Cache Prisma Client
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: backend/node_modules/.prisma
         key: prisma-${{ hashFiles('backend/prisma/schema.prisma') }}
@@ -411,7 +411,7 @@ jobs:
         npx playwright install --with-deps ${{ matrix.browser }}
 
     - name: Cache Playwright Browsers
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/ms-playwright
         key: playwright-${{ matrix.browser }}-${{ hashFiles('package-lock.json') }}
