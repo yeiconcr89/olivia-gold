@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
+
   build: {
     // Optimizaciones de build
     rollupOptions: {
@@ -31,35 +31,35 @@ export default defineConfig({
             // Default vendor chunk for smaller libraries
             return 'vendor';
           }
-          
+
           // Admin components (large and rarely used)
-          if (id.includes('AdminDashboard') || 
-              id.includes('admin/') ||
-              id.includes('AdminRoute') ||
-              id.includes('BulkImport') ||
-              id.includes('BulkOperations')) {
+          if (id.includes('AdminDashboard') ||
+            id.includes('admin/') ||
+            id.includes('AdminRoute') ||
+            id.includes('BulkImport') ||
+            id.includes('BulkOperations')) {
             return 'admin';
           }
-          
+
           // Checkout flow (large but specific use case)
-          if (id.includes('checkout/') || 
-              id.includes('CheckoutFlow') ||
-              id.includes('tracking/')) {
+          if (id.includes('checkout/') ||
+            id.includes('CheckoutFlow') ||
+            id.includes('tracking/')) {
             return 'checkout';
           }
-          
+
           // Product-related components (frequently used together)
           if (id.includes('ProductCard') ||
-              id.includes('ProductGrid') ||
-              id.includes('ProductModal') ||
-              id.includes('ProductForm')) {
+            id.includes('ProductGrid') ||
+            id.includes('ProductModal') ||
+            id.includes('ProductForm')) {
             return 'products';
           }
-          
+
           // Auth components
           if (id.includes('LoginModal') ||
-              id.includes('GoogleCallback') ||
-              id.includes('AuthContext')) {
+            id.includes('GoogleCallback') ||
+            id.includes('AuthContext')) {
             return 'auth';
           }
         },
@@ -87,6 +87,6 @@ export default defineConfig({
   // Optimizaciones de desarrollo
   esbuild: {
     // Remover console.log en producción
-    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+    // drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
 });
