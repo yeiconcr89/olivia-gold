@@ -279,7 +279,7 @@ jobs:
     
     steps:
     - name: 📥 Download audit reports
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v6
       with:
         path: security-reports/
       continue-on-error: true
