@@ -10,7 +10,7 @@
     "dev": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
     "dev:clean": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
     "build": "tsc",
-    "start": "tsx src/scripts/restart-server.ts && node dist/server.js",
+    "start": "node dist/server.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
