@@ -112,7 +112,7 @@ jobs:
         DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public
 
     - name: 📊 Upload backend coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./backend/coverage/lcov.info
         flags: backend
@@ -145,7 +145,7 @@ jobs:
       run: npm run test:coverage
 
     - name: 📊 Upload frontend coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./coverage/lcov.info
         flags: frontend
