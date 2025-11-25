@@ -75,30 +75,15 @@ const baseEnvSchema = z.object({
     .email('CONTACT_EMAIL debe ser un email válido')
     .default('servicio@oliviagold.com'),
 
-  // Cloudinary
-  CLOUDINARY_CLOUD_NAME: z.string()
-    .min(1, 'CLOUDINARY_CLOUD_NAME es requerido'),
+  // Cloudinary (Opcional)
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+  CLOUDINARY_API_KEY: z.string().optional().default(''),
+  CLOUDINARY_API_SECRET: z.string().optional().default(''),
 
-  CLOUDINARY_API_KEY: z.string()
-    .min(1, 'CLOUDINARY_API_KEY es requerido')
-    .regex(/^\d+$/, 'CLOUDINARY_API_KEY debe ser numérico'),
-
-  CLOUDINARY_API_SECRET: z.string()
-    .min(20, 'CLOUDINARY_API_SECRET debe tener al menos 20 caracteres'),
-
-  // Google OAuth
-  GOOGLE_CLIENT_ID: z.string()
-    .min(1, 'GOOGLE_CLIENT_ID es requerido')
-    .regex(/\.googleusercontent\.com$/, 'GOOGLE_CLIENT_ID debe terminar en .googleusercontent.com'),
-
-  GOOGLE_CLIENT_SECRET: z.string()
-    .min(20, 'GOOGLE_CLIENT_SECRET debe tener al menos 20 caracteres'),
-
-  GOOGLE_CALLBACK_URL: z.string()
-    .url('GOOGLE_CALLBACK_URL debe ser una URL válida')
-    .refine(url => url.includes('/api/auth/google/callback'), {
-      message: 'GOOGLE_CALLBACK_URL debe incluir /api/auth/google/callback'
-    }),
+  // Google OAuth (Opcional)
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
+  GOOGLE_CALLBACK_URL: z.string().optional().default(''),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.string()
