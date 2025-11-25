@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { logger } from '../utils/logger';
-
-import { Request, Response, NextFunction } from 'express';
-import { z } from 'zod';
 import { BadRequestError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -46,7 +42,7 @@ export const validateParams = (schema: z.ZodSchema) => {
           details: errorDetails,
         });
       }
-      
+
       logger.error('Validation middleware error:', error);
       return res.status(500).json({
         error: 'Error interno del servidor',
@@ -73,7 +69,7 @@ export const validateQuery = (schema: z.ZodSchema) => {
           details: errorDetails,
         });
       }
-      
+
       logger.error('Validation middleware error:', error);
       return res.status(500).json({
         error: 'Error interno del servidor',

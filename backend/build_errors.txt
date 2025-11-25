@@ -1,0 +1,230 @@
+src/config/database-optimized.ts(50,5): error TS2322: Type '{ emit: string; level: "query"; }' is not assignable to type 'LogLevel | LogDefinition'.
+  Types of property 'emit' are incompatible.
+    Type 'string' is not assignable to type '"stdout" | "event"'.
+src/config/database-optimized.ts(51,7): error TS2322: Type 'string' is not assignable to type '"stdout" | "event"'.
+src/config/database-optimized.ts(52,7): error TS2322: Type 'string' is not assignable to type '"stdout" | "event"'.
+src/config/env-validation.ts(154,17): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/config/env-validation.ts(154,47): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/config/env-validation.ts(155,15): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/auth.ts(163,46): error TS2304: Cannot find name 'AuthenticatedRequest'.
+src/middleware/auth.ts(180,11): error TS2353: Object literal may only specify known properties, and 'name' does not exist in type 'UserSelect<DefaultArgs>'.
+src/middleware/auth.ts(191,16): error TS2339: Property 'status' does not exist on type '{ email: string; id: string; isActive: boolean; createdAt: Date; updatedAt: Date; password: string; googleId: string; role: UserRole; }'.
+src/middleware/auth.ts(206,35): error TS2304: Cannot find name 'AuthenticatedRequest'.
+src/middleware/fileValidation.ts(198,60): error TS2345: Argument of type 'string' is not assignable to parameter of type 'never'.
+src/middleware/fileValidation.ts(359,3): error TS2322: Type '(chunk?: any, encoding?: any) => void' is not assignable to type '{ (cb?: () => void): Response<any, Record<string, any>>; (chunk: any, cb?: () => void): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: () => void): Response<...>; }'.
+  Type 'void' is not assignable to type 'Response<any, Record<string, any>>'.
+src/middleware/securityLogger.ts(236,43): error TS2339: Property 'securityLog' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/middleware/securityLogger.ts(271,18): error TS2339: Property 'securityLog' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/middleware/validate.ts(2,10): error TS2724: '"zod"' has no exported member named 'AnyZodObject'. Did you mean 'ZodObject'?
+src/middleware/validate.ts(12,57): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validate.ts(15,25): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validation.ts(1,10): error TS2300: Duplicate identifier 'Request'.
+src/middleware/validation.ts(1,19): error TS2300: Duplicate identifier 'Response'.
+src/middleware/validation.ts(1,29): error TS2300: Duplicate identifier 'NextFunction'.
+src/middleware/validation.ts(2,10): error TS2300: Duplicate identifier 'z'.
+src/middleware/validation.ts(3,10): error TS2300: Duplicate identifier 'logger'.
+src/middleware/validation.ts(5,10): error TS2300: Duplicate identifier 'Request'.
+src/middleware/validation.ts(5,19): error TS2300: Duplicate identifier 'Response'.
+src/middleware/validation.ts(5,29): error TS2300: Duplicate identifier 'NextFunction'.
+src/middleware/validation.ts(6,10): error TS2300: Duplicate identifier 'z'.
+src/middleware/validation.ts(8,10): error TS2300: Duplicate identifier 'logger'.
+src/middleware/validation.ts(16,30): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validation.ts(20,42): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validation.ts(35,7): error TS2322: Type 'unknown' is not assignable to type 'ParamsDictionary'.
+  Index signature for type 'string' is missing in type '{}'.
+src/middleware/validation.ts(39,36): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validation.ts(62,7): error TS2322: Type 'unknown' is not assignable to type 'ParsedQs'.
+  Index signature for type 'string' is missing in type '{}'.
+src/middleware/validation.ts(66,36): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/admin-payments.ts(52,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(57,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(65,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(71,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(80,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(88,14): error TS2339: Property 'paymentRefund' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(97,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(115,45): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(126,39): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(216,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(244,14): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(294,38): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(363,38): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(409,31): error TS2339: Property 'message' does not exist on type 'RefundResponse'.
+src/routes/admin-payments.ts(414,33): error TS2339: Property 'paymentRefund' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(428,20): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(522,40): error TS2339: Property 'paymentFailedAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/admin-payments.ts(581,38): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/routes/advanced-orders.ts(66,30): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/advanced-orders.ts(92,30): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/advanced-orders.ts(132,44): error TS2554: Expected 1 arguments, but got 2.
+src/routes/auth.ts(39,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: SignOptions & { algorithm: "none"; }): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, options?: SignOptions): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+src/routes/auth.ts(151,24): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/auth.ts(278,24): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/bulk.ts(354,40): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/cache.ts(52,60): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/cache.ts(79,77): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/cache.ts(107,92): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/cache.ts(131,62): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/cache.ts(149,67): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/cart.ts(17,5): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>>; message?: string; }): ZodString', gave the following error.
+    Object literal may only specify known properties, and 'required_error' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>>; message?: string; }'.
+  Overload 2 of 2, '(params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>>; message?: string; }): $ZodType<string, string, $ZodTypeInternals<string, string>>', gave the following error.
+    Object literal may only specify known properties, and 'required_error' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>>; message?: string; }'.
+src/routes/cart.ts(21,5): error TS2353: Object literal may only specify known properties, and 'required_error' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>>; message?: string; }'.
+src/routes/cart.ts(24,11): error TS2554: Expected 0 arguments, but got 1.
+src/routes/cart.ts(45,30): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/cart.ts(72,30): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/cart.ts(224,29): error TS2552: Cannot find name 'prisma'. Did you mean '__prisma'?
+src/routes/coupons.ts(71,14): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(82,14): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(112,41): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(123,33): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(133,71): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/coupons.ts(151,33): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(191,41): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(211,40): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(216,83): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/coupons.ts(234,41): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(255,18): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/coupons.ts(259,82): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/coupons.ts(283,33): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/routes/customers.ts(36,70): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(def: number): ZodDefault<ZodPipe<ZodPipe<ZodString, ZodTransform<number, string>>, ZodNumber>>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'number'.
+  Overload 2 of 2, '(def: () => number): ZodDefault<ZodPipe<ZodPipe<ZodString, ZodTransform<number, string>>, ZodNumber>>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '() => number'.
+src/routes/customers.ts(37,80): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(def: number): ZodDefault<ZodPipe<ZodPipe<ZodString, ZodTransform<number, string>>, ZodNumber>>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'number'.
+  Overload 2 of 2, '(def: () => number): ZodDefault<ZodPipe<ZodPipe<ZodString, ZodTransform<number, string>>, ZodNumber>>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '() => number'.
+src/routes/database-optimization.ts(58,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/database-optimization.ts(199,67): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/database-optimization.ts(215,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/database-optimization.ts(243,70): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/database-optimization.ts(257,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/database-optimization.ts(290,60): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/database-optimization.ts(306,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/database-optimization.ts(325,65): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/heroSlider.ts(114,41): error TS2345: Argument of type '{ title: string; subtitle: string; description: string; imageUrl: string; ctaText?: string; ctaLink?: string; offerText?: string; isActive?: boolean; orderIndex?: number; }' is not assignable to parameter of type 'CreateHeroSlideData'.
+  Property 'ctaText' is optional in type '{ title: string; subtitle: string; description: string; imageUrl: string; ctaText?: string; ctaLink?: string; offerText?: string; isActive?: boolean; orderIndex?: number; }' but required in type 'CreateHeroSlideData'.
+src/routes/inventory-movements.ts(56,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/inventory-movements.ts(99,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/inventory-movements.ts(136,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/inventory-movements.ts(199,68): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/inventory-movements.ts(209,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/inventory.ts(147,19): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/order.routes.ts(2,10): error TS2305: Module '"../services/order.service"' has no exported member 'OrderService'.
+src/routes/order.routes.ts(3,29): error TS2305: Module '"../middleware/auth"' has no exported member 'isAdmin'.
+src/routes/order.routes.ts(52,19): error TS2339: Property 'isAdmin' does not exist on type 'User'.
+src/routes/order.routes.ts(52,63): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/orders.ts(108,70): error TS2345: Argument of type '{ page: number; limit: number; sortBy: "status" | "customerName" | "total" | "orderDate"; sortOrder: "asc" | "desc"; search?: string; status?: "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED"; paymentStatus?: "PENDING" | ... 2 more ... | "REFUNDED"; customerId?: string; startDate?: stri...' is not assignable to parameter of type '{ page: number; limit: number; sortBy: "status" | "customerName" | "total" | "orderDate"; sortOrder: "asc" | "desc"; search?: string; status?: "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED"; paymentStatus?: "PENDING" | ... 2 more ... | "REFUNDED"; customerId?: string; startDate?: Date...'.
+  Types of property 'startDate' are incompatible.
+    Type 'string' is not assignable to type 'Date'.
+src/routes/payments-simple.ts(112,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(8,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/routes/payments.ts(32,15): error TS2554: Expected 2-3 arguments, but got 1.
+src/routes/payments.ts(255,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(330,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(404,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(648,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(684,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(797,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/payments.ts(861,23): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/routes/performance.ts(83,72): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/reviews.ts(203,74): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/reviews.ts(205,80): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/reviews.ts(238,38): error TS2339: Property 'id' does not exist on type 'User'.
+src/routes/reviews.ts(240,60): error TS2339: Property 'email' does not exist on type 'User'.
+src/routes/upload.ts(469,3): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(req: Request, res: Response<any, Record<string, any>, number>) => Promise<Response<any, Record<string, any>, number>>' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '(req: Request, res: Response<any, Record<string, any>, number>) => Promise<Response<any, Record<string, any>, number>>' is not assignable to type 'RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+        Types of parameters 'req' and 'req' are incompatible.
+          Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Request': cache, credentials, destination, integrity, and 15 more.
+src/routes/upload.ts(471,23): error TS2352: Conversion of type 'Request' to type 'AuthRequest' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Request' is missing the following properties from type 'AuthRequest': get, header, accepts, acceptsCharsets, and 102 more.
+src/routes/wompi.ts(5,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/routes/wompi.ts(50,100): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/scripts/clean-duplicates.ts(106,22): error TS2339: Property 'address' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data-simple.ts(108,20): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data-simple.ts(147,20): error TS2339: Property 'paymentFailedAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data-simple.ts(193,20): error TS2339: Property 'paymentWebhookEvent' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data-simple.ts(199,18): error TS2339: Property 'paymentRefund' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data-simple.ts(254,20): error TS2339: Property 'paymentGatewayLog' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data.ts(151,9): error TS2322: Type '{ id: string; customerId: string; status: string; total: number; subtotal: number; tax: number; shipping: number; }' is not assignable to type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+  Type '{ id: string; customerId: string; status: string; total: number; subtotal: number; tax: number; shipping: number; }' is not assignable to type 'Without<OrderUncheckedCreateInput, OrderCreateInput> & OrderCreateInput'.
+    Type '{ id: string; customerId: string; status: string; total: number; subtotal: number; tax: number; shipping: number; }' is not assignable to type 'Without<OrderUncheckedCreateInput, OrderCreateInput>'.
+      Types of property 'customerId' are incompatible.
+        Type 'string' is not assignable to type 'never'.
+src/scripts/seed-payment-data.ts(166,11): error TS2353: Object literal may only specify known properties, and 'orderId_productId' does not exist in type 'OrderItemWhereUniqueInput'.
+src/scripts/seed-payment-data.ts(264,20): error TS2339: Property 'paymentTransaction' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data.ts(303,20): error TS2339: Property 'paymentFailedAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data.ts(349,20): error TS2339: Property 'paymentWebhookEvent' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data.ts(355,18): error TS2339: Property 'paymentRefund' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/seed-payment-data.ts(407,20): error TS2339: Property 'paymentGatewayLog' does not exist on type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+src/scripts/test-order.ts(95,9): error TS2322: Type '{ customerId: string; customerName: string; customerEmail: string; customerPhone: string; status: "PENDING"; subtotal: number; shippingAmount: number; taxAmount: number; total: number; paymentMethod: string; paymentStatus: "PENDING"; items: { ...; }; shippingAddress: { ...; }; }' is not assignable to type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+  Type '{ customerId: string; customerName: string; customerEmail: string; customerPhone: string; status: "PENDING"; subtotal: number; shippingAmount: number; taxAmount: number; total: number; paymentMethod: string; paymentStatus: "PENDING"; items: { ...; }; shippingAddress: { ...; }; }' is not assignable to type 'Without<OrderUncheckedCreateInput, OrderCreateInput> & OrderCreateInput'.
+    Type '{ customerId: string; customerName: string; customerEmail: string; customerPhone: string; status: "PENDING"; subtotal: number; shippingAmount: number; taxAmount: number; total: number; paymentMethod: string; paymentStatus: "PENDING"; items: { ...; }; shippingAddress: { ...; }; }' is not assignable to type 'Without<OrderUncheckedCreateInput, OrderCreateInput>'.
+      Types of property 'customerId' are incompatible.
+        Type 'string' is not assignable to type 'never'.
+src/scripts/test-order.ts(155,23): error TS2551: Property 'customer' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'. Did you mean 'customerId'?
+src/scripts/test-order.ts(156,20): error TS2339: Property 'items' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/scripts/test-order.ts(224,78): error TS2339: Property 'total' does not exist on type '{ product: { name: string; id: string; description: string; createdAt: Date; updatedAt: Date; price: Decimal; originalPrice: Decimal; category: string; subcategory: string; ... 6 more ...; reviewCount: number; }; } & { ...; }'.
+src/services/advanced-order.service.ts(138,25): error TS2339: Property 'coupon' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+src/services/advanced-order.service.ts(163,33): error TS2339: Property 'shippingMethod' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+src/services/advanced-order.service.ts(206,9): error TS2353: Object literal may only specify known properties, and 'couponId' does not exist in type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+src/services/advanced-order.service.ts(228,9): error TS2353: Object literal may only specify known properties, and 'coupon' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/services/advanced-order.service.ts(248,16): error TS2339: Property 'coupon' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+src/services/advanced-order.service.ts(255,14): error TS2339: Property 'orderTracking' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+src/services/advanced-order.service.ts(313,9): error TS2322: Type '"PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "PAID" | "REFUNDED" | "PREPARING" | "IN_TRANSIT" | "OUT_FOR_DELIVERY" | "PARTIALLY_DELIVERED" | "RETURNED"' is not assignable to type 'OrderStatus | EnumOrderStatusFieldUpdateOperationsInput'.
+  Type '"PAID"' is not assignable to type 'OrderStatus | EnumOrderStatusFieldUpdateOperationsInput'.
+src/services/advanced-order.service.ts(314,9): error TS2322: Type '"PROCESSING" | PaymentStatus | "PARTIAL_REFUND" | "CHARGEBACK"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFieldUpdateOperationsInput'.
+  Type '"PROCESSING"' is not assignable to type 'PaymentStatus | EnumPaymentStatusFieldUpdateOperationsInput'.
+src/services/advanced-order.service.ts(322,14): error TS2339: Property 'orderTracking' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+src/services/advanced-order.service.ts(405,7): error TS2353: Object literal may only specify known properties, and 'tracking' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/services/advanced-order.service.ts(423,22): error TS2339: Property 'items' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(427,18): error TS2339: Property 'items' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(434,28): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(435,21): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(436,19): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(437,20): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(438,22): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(439,22): error TS2339: Property 'shippingAddress' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(441,21): error TS2339: Property 'tracking' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; couponCode: string; customerId: string; status: OrderStatus; orderNumber: string; customerName: string; ... 12 more ...; notes: string; }'.
+src/services/advanced-order.service.ts(585,16): error TS2339: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/services/cart.service.ts(394,31): error TS2339: Property 'coupon' does not exist on type 'PrismaClient<PrismaClientOptions, "info" | "error" | "warn" | "query", DefaultArgs>'.
+src/services/cart.service.ts(425,7): error TS2353: Object literal may only specify known properties, and 'couponId' does not exist in type '(Without<CartUpdateInput, CartUncheckedUpdateInput> & CartUncheckedUpdateInput) | (Without<...> & CartUpdateInput)'.
+src/services/database-optimization.service.ts(1,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/services/heroSlider.service.ts(71,5): error TS2322: Type 'CreateHeroSlideData' is not assignable to type '(Without<HeroSlideCreateInput, HeroSlideUncheckedCreateInput> & HeroSlideUncheckedCreateInput) | (Without<...> & HeroSlideCreateInput)'.
+  Type 'CreateHeroSlideData' is not assignable to type 'Without<HeroSlideUncheckedCreateInput, HeroSlideCreateInput> & HeroSlideCreateInput'.
+    Type 'CreateHeroSlideData' is not assignable to type 'HeroSlideCreateInput'.
+      Property 'ctaLink' is optional in type 'CreateHeroSlideData' but required in type 'HeroSlideCreateInput'.
+src/services/inventory-movements.service.ts(1,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/services/inventory.service.ts(294,7): error TS2322: Type '{ productId: string; type: InventoryMovementType; quantity: number; reason: string; }' is not assignable to type '(Without<InventoryMovementCreateInput, InventoryMovementUncheckedCreateInput> & InventoryMovementUncheckedCreateInput) | (Without<...> & InventoryMovementCreateInput)'.
+  Type '{ productId: string; type: InventoryMovementType; quantity: number; reason: string; }' is not assignable to type 'Without<InventoryMovementUncheckedCreateInput, InventoryMovementCreateInput> & InventoryMovementCreateInput'.
+    Type '{ productId: string; type: InventoryMovementType; quantity: number; reason: string; }' is not assignable to type 'Without<InventoryMovementUncheckedCreateInput, InventoryMovementCreateInput>'.
+      Types of property 'productId' are incompatible.
+        Type 'string' is not assignable to type 'never'.
+src/services/optimized-order.service.ts(1,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/services/optimized-order.service.ts(425,3): error TS2305: Module '"./advanced-order.service"' has no exported member 'createOrder'.
+src/services/optimized-order.service.ts(427,3): error TS2305: Module '"./advanced-order.service"' has no exported member 'cancelOrder'.
+src/services/optimized-order.service.ts(429,3): error TS2724: '"./advanced-order.service"' has no exported member named 'getOrders'. Did you mean 'getAllOrders'?
+src/services/optimized-product.service.ts(1,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/services/optimized-product.service.ts(452,3): error TS2724: '"./product.service"' has no exported member named 'getProducts'. Did you mean 'getAllProducts'?
+src/services/payment/payment-router.service.ts(2,10): error TS2614: Module '"../../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../../config/database-optimized"' instead?
+src/services/payment/payment-router.service.ts(110,15): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'PaymentMethod'.
+src/services/payment/payment-router.service.ts(111,27): error TS2339: Property 'metadata' does not exist on type 'PaymentMethod'.
+src/services/query-performance.service.ts(1,10): error TS2614: Module '"../config/database-optimized"' has no exported member 'prisma'. Did you mean to use 'import prisma from "../config/database-optimized"' instead?
+src/services/redis.service.ts(18,9): error TS2353: Object literal may only specify known properties, and 'lazyConnect' does not exist in type 'RedisClientOptions<RedisModules, {}, {}, 2, {}, RedisSocketOptions>'.
+src/services/redis.service.ts(68,33): error TS2345: Argument of type 'string | {}' is not assignable to parameter of type 'string'.
+  Type '{}' is not assignable to type 'string'.
+src/services/redis.service.ts(120,33): error TS2345: Argument of type 'string | {}' is not assignable to parameter of type 'string'.
+  Type '{}' is not assignable to type 'string'.
