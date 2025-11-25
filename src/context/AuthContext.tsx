@@ -63,24 +63,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (storedToken && storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser);
+            console.log('🔄 AuthContext.initAuth - Restored user from localStorage:', parsedUser);
+            console.log('🔄 AuthContext.initAuth - User role:', parsedUser.role);
+
             setUser(parsedUser);
             setToken(storedToken);
             setAuthMethod(storedMethod);
 
             // Validar token directamente sin usar la función que causa bucles
+            console.log('🔄 AuthContext.initAuth - Validating token...');
             const data = await apiRequest<{ user: User }>(API_CONFIG.ENDPOINTS.AUTH.VALIDATE, {
               method: 'GET',
               headers: createAuthHeaders(storedToken)
             });
 
+            console.log('🔄 AuthContext.initAuth - Token validation response:', data);
+            console.log('🔄 AuthContext.initAuth - Validated user role:', data.user?.role);
+
             if (!data.user) {
               // Si el token no es válido, limpiar todo
+              console.log('🔄 AuthContext.initAuth - Token invalid, clearing auth state');
               setUser(null);
               setToken(null);
               setAuthMethod(null);
               localStorage.removeItem('token');
               localStorage.removeItem('user');
               localStorage.removeItem('authMethod');
+            } else {
+              console.log('🔄 AuthContext.initAuth - Token valid, user authenticated');
             }
           } catch (validationError) {
             // Token inválido, limpiar estado
@@ -112,6 +122,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (user: User, token: string, method: 'email' | 'google' = 'email'): Promise<void> => {
     try {
+      console.log('🔑 AuthContext.login - Received user data:', user);
+      console.log('🔑 AuthContext.login - User role:', user.role);
+      console.log('🔑 AuthContext.login - Token:', token ? 'Present' : 'Missing');
+      console.log('🔑 AuthContext.login - Method:', method);
+
       setUser(user);
       setToken(token);
       setAuthMethod(method);
@@ -119,6 +134,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('authMethod', method);
+
+      console.log('🔑 AuthContext.login - Data saved to localStorage');
+      console.log('🔑 AuthContext.login - Stored user:', localStorage.getItem('user'));
     } catch (error) {
       console.error('Error during login:', error);
       throw error;
