@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_CONFIG } from '../config/api';
 
 interface Testimonial {
     id: string;
