@@ -3,7 +3,7 @@
  * Centraliza todas las URLs y configuraciones de API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 export const API_CONFIG = {
   BASE_URL: API_BASE_URL,
@@ -97,7 +97,7 @@ export const API_CONFIG = {
  */
 export const createAuthHeaders = (token?: string) => {
   const headers: Record<string, string> = { ...API_CONFIG.DEFAULT_HEADERS };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   } else {
@@ -107,7 +107,7 @@ export const createAuthHeaders = (token?: string) => {
       headers['Authorization'] = `Bearer ${storedToken}`;
     }
   }
-  
+
   return headers;
 };
 
