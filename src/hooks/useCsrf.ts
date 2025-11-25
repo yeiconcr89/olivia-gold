@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_CONFIG } from '../config/api';
 
 interface CsrfState {
   token: string | null;
@@ -28,7 +29,7 @@ export const useCsrf = () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/csrf-token', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/csrf-token`, {
         method: 'GET',
         credentials: 'include', // Incluir cookies de sesión
         headers: {
@@ -41,7 +42,7 @@ export const useCsrf = () => {
       }
 
       const data: CsrfResponse = await response.json();
-      
+
       setState({
         token: data.csrfToken,
         loading: false,
@@ -56,7 +57,7 @@ export const useCsrf = () => {
         loading: false,
         error: errorMessage
       });
-      
+
       console.error('Error fetching CSRF token:', error);
       return null;
     }
@@ -67,7 +68,7 @@ export const useCsrf = () => {
    */
   const getTokenFromCookie = useCallback((): string | null => {
     if (typeof document === 'undefined') return null;
-    
+
     const cookies = document.cookie.split(';');
     for (const cookie of cookies) {
       const [name, value] = cookie.trim().split('=');
@@ -104,11 +105,11 @@ export const useCsrf = () => {
    */
   const csrfFetch = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
     let token = getCurrentToken();
-    
+
     // Si no hay token y es un método que lo requiere, obtenerlo
     const method = options.method?.toUpperCase() || 'GET';
     const requiresToken = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-    
+
     if (requiresToken && !token) {
       token = await fetchCsrfToken();
     }
@@ -185,10 +186,10 @@ export const createCsrfAxiosInterceptor = (axiosInstance: AxiosInstance) => {
     async (config: AxiosRequestConfig) => {
       // Solo agregar token CSRF en métodos que lo requieren
       const requiresToken = !['get', 'head', 'options'].includes(config.method?.toLowerCase());
-      
+
       if (requiresToken && process.env.NODE_ENV === 'production') {
         try {
-          const response = await fetch('/api/csrf-token', {
+          const response = await fetch(`${API_CONFIG.BASE_URL}/api/csrf-token`, {
             credentials: 'include'
           });
           if (response.ok) {
@@ -199,7 +200,7 @@ export const createCsrfAxiosInterceptor = (axiosInstance: AxiosInstance) => {
           console.warn('Could not fetch CSRF token:', error);
         }
       }
-      
+
       return config;
     },
     (error: unknown) => Promise.reject(error)

@@ -11,6 +11,7 @@
     "dev:clean": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
     "build": "tsc || true",
     "start": "node dist/server.js",
+    "deploy": "npx prisma migrate deploy && npx prisma db seed && node dist/server.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
