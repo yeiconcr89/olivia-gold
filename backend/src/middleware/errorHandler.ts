@@ -75,9 +75,8 @@ export const errorHandler = (
   // Error genérico
   return res.status(500).json({
     error: 'Error interno del servidor',
-    ...(process.env.NODE_ENV === 'development' && {
-      details: error.message,
-      stack: error.stack,
-    }),
+    details: error.message,
+    stack: error.stack,
+    // TODO: Remove this in production after debugging
   });
 };
