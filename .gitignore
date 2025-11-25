@@ -1,0 +1,51 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+backend/.env
+backend/.env.local
+backend/.env.production
+backend/.env.staging
+
+# Production secrets
+**/PRODUCTION_SECRETS_INFO.txt
+**/production-secrets.txt
+**/secrets.txt
+
+# Test/coverage y artefactos generados
+coverage/
+coverage/.tmp/
+pacts/*.json
+
+# Caches locales
+backend/.npm-cache/
+
+# Directorios de asistentes/AI (excluir del repo y entregables)
+.bolt/
+.claude/
+.kiro/

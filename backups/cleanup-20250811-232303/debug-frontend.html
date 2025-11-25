@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Frontend</title>
+</head>
+<body>
+    <h1>Debug Frontend - Pedidos</h1>
+    <button onclick="testLogin()">1. Test Login</button>
+    <button onclick="testOrders()">2. Test Orders API</button>
+    <button onclick="testLocalStorage()">3. Check LocalStorage</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        let token = null;
+
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+
+        async function testLogin() {
+            try {
+                log('🧪 Probando login...');
+                
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@joyceriaelegante.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                token = data.token;
+                
+                // Simular localStorage
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('authMethod', 'email');
+                
+                log('✅ Login exitoso: ' + data.user.email);
+                log('🔑 Token guardado en localStorage');
+                
+            } catch (error) {
+                log('❌ Error en login: ' + error.message);
+            }
+        }
+
+        async function testOrders() {
+            try {
+                const storedToken = localStorage.getItem('token');
+                if (!storedToken) {
+                    log('❌ No hay token en localStorage. Haz login primero.');
+                    return;
+                }
+                
+                log('🔄 Probando API de pedidos...');
+                log('🔑 Usando token: ' + storedToken.substring(0, 20) + '...');
+                
+                const response = await fetch(`${API_BASE}/api/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log('📡 Response status: ' + response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log('❌ Error response: ' + errorText);
+                    return;
+                }
+                
+                const data = await response.json();
+                log('✅ Pedidos obtenidos: ' + data.orders.length);
+                log('📋 Datos: ' + JSON.stringify(data, null, 2));
+                
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+            }
+        }
+
+        function testLocalStorage() {
+            log('🔍 Revisando localStorage...');
+            log('Token: ' + (localStorage.getItem('token') ? 'Presente' : 'Ausente'));
+            log('User: ' + (localStorage.getItem('user') ? 'Presente' : 'Ausente'));
+            log('AuthMethod: ' + localStorage.getItem('authMethod'));
+            
+            if (localStorage.getItem('user')) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                log('👤 Usuario: ' + user.email + ' (' + user.role + ')');
+            }
+        }
+    </script>
+</body>
+</html>

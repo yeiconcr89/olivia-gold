@@ -1,0 +1,19 @@
+{
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [
+    "GHSA-67hx-6x53-jw92"
+  ],
+  "report-type": "summary",
+  "package-manager": "npm",
+  "path": ".",
+  "show-found": true,
+  "show-not-found": false,
+  "retry": {
+    "count": 3,
+    "factor": 2,
+    "minTimeout": 1000,
+    "maxTimeout": 10000
+  }
+}

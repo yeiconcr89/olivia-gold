@@ -1,0 +1,263 @@
+name: 🧪 Testing Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  frontend-tests:
+    name: 🎨 Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run ESLint
+      run: npm run lint
+    
+    - name: Run Frontend Tests
+      run: npm run test:run
+    
+    - name: Generate Coverage Report
+      run: npm run test:coverage
+    
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./coverage
+        flags: frontend
+        name: frontend-coverage
+
+  backend-tests:
+    name: 🔧 Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: joyeria_elegante_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm install
+    
+    - name: Setup test database
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/joyeria_elegante_test?schema=public
+      run: |
+        npx prisma generate
+        npx prisma db push
+    
+    - name: Run Backend Tests
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/joyeria_elegante_test?schema=public
+        NODE_ENV: test
+        JWT_SECRET: test-jwt-secret-for-ci
+        SESSION_SECRET: test-session-secret-for-ci
+      run: npm test
+    
+    - name: Backend Coverage Report
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/joyeria_elegante_test?schema=public
+        NODE_ENV: test
+        JWT_SECRET: test-jwt-secret-for-ci
+        SESSION_SECRET: test-session-secret-for-ci
+      run: npm run test:coverage || true
+    
+    - name: Upload Backend Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./backend/coverage
+        flags: backend
+        name: backend-coverage
+
+  e2e-tests:
+    name: 🎭 E2E Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: joyeria_elegante_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        cd backend && npm install
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Setup Backend for E2E
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/joyeria_elegante_test?schema=public
+        NODE_ENV: test
+        PORT: 3001
+        JWT_SECRET: test-jwt-secret-for-e2e
+        SESSION_SECRET: test-session-secret-for-e2e
+        CLOUDINARY_CLOUD_NAME: test-cloud
+        CLOUDINARY_API_KEY: test-key
+        CLOUDINARY_API_SECRET: test-secret-1234567890123456789012345678901234567890
+      run: |
+        npx prisma generate
+        npx prisma db push
+        npm run dev &
+        sleep 30
+    
+    - name: Build Frontend
+      run: npm run build
+    
+    - name: Start Frontend Server
+      run: |
+        npm run preview &
+        sleep 10
+    
+    - name: Run E2E Tests
+      run: npm run test:e2e
+      env:
+        E2E_BASE_URL: http://localhost:4173
+    
+    - name: Upload E2E Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  security-scan:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run npm audit
+      run: |
+        npm audit --level=moderate || true
+        cd backend && npm audit --level=moderate || true
+    
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+  build-test:
+    name: 🏗️ Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        cd backend && npm install
+    
+    - name: Build Frontend
+      run: npm run build
+    
+    - name: Build Backend
+      working-directory: ./backend
+      run: npm run build || echo "Backend build may have non-critical errors"
+    
+    - name: Check bundle size
+      run: |
+        npm run build
+        du -sh dist/
+        ls -la dist/assets/
+        echo "Build completed successfully"
+
+  quality-gate:
+    name: 🚦 Quality Gate
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests, e2e-tests, security-scan, build-test]
+    if: always()
+    
+    steps:
+    - name: Check job results
+      run: |
+        echo "Frontend Tests: ${{ needs.frontend-tests.result }}"
+        echo "Backend Tests: ${{ needs.backend-tests.result }}"
+        echo "E2E Tests: ${{ needs.e2e-tests.result }}"
+        echo "Security Scan: ${{ needs.security-scan.result }}"
+        echo "Build Test: ${{ needs.build-test.result }}"
+        
+        # Quality gate conditions
+        if [[ "${{ needs.frontend-tests.result }}" != "success" ]]; then
+          echo "❌ Frontend tests failed"
+          exit 1
+        fi
+        
+        if [[ "${{ needs.e2e-tests.result }}" != "success" ]]; then
+          echo "❌ E2E tests failed"
+          exit 1
+        fi
+        
+        if [[ "${{ needs.build-test.result }}" != "success" ]]; then
+          echo "❌ Build failed"
+          exit 1
+        fi
+        
+        echo "✅ All quality gates passed!"

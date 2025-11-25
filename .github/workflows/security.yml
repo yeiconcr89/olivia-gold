@@ -1,0 +1,361 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans every Monday at 10:00 AM UTC
+    - cron: '0 10 * * 1'
+
+jobs:
+  # ============================================================================
+  # DEPENDENCY VULNERABILITY SCANNING
+  # ============================================================================
+  dependency-scan:
+    name: 🔍 Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        directory: ['.', './backend']
+        
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: '${{ matrix.directory }}/package-lock.json'
+
+    - name: 📦 Install dependencies
+      working-directory: ${{ matrix.directory }}
+      run: npm ci
+
+    - name: 🔍 Run npm audit
+      working-directory: ${{ matrix.directory }}
+      run: |
+        echo "Running npm audit for ${{ matrix.directory }}"
+        npm audit --audit-level=moderate
+      continue-on-error: true
+
+    - name: 📊 Generate audit report
+      working-directory: ${{ matrix.directory }}
+      run: |
+        npm audit --json > audit-report.json || true
+        npm audit --audit-level=low --json > detailed-audit.json || true
+
+    - name: 📤 Upload audit reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: audit-report-${{ matrix.directory == '.' && 'frontend' || 'backend' }}
+        path: |
+          ${{ matrix.directory }}/audit-report.json
+          ${{ matrix.directory }}/detailed-audit.json
+        retention-days: 30
+
+  # ============================================================================
+  # CODE SECURITY ANALYSIS
+  # ============================================================================
+  code-security:
+    name: 🔐 Code Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔐 Run Semgrep security analysis
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/owasp-top-ten
+          p/nodejs
+          p/typescript
+          p/react
+          p/express
+          p/jwt
+          p/postgres
+        generateSarif: "1"
+      env:
+        SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+    - name: 📤 Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: semgrep.sarif
+      if: always()
+
+  # ============================================================================
+  # CODEQL ANALYSIS
+  # ============================================================================
+  codeql:
+    name: 🔍 CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'typescript' ]
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+
+    - name: 🏗️ Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # ============================================================================
+  # SECRET SCANNING
+  # ============================================================================
+  secret-scan:
+    name: 🔑 Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for secret scanning
+
+    - name: 🔑 Run TruffleHog secret scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  # ============================================================================
+  # DOCKER SECURITY SCANNING
+  # ============================================================================
+  docker-security:
+    name: 🐳 Docker Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐳 Build Docker image
+      run: |
+        if [ -f "Dockerfile" ]; then
+          docker build -t olivia-gold:security-scan .
+        else
+          echo "No Dockerfile found, skipping Docker security scan"
+          exit 0
+        fi
+
+    - name: 🔍 Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      if: hashFiles('Dockerfile') != ''
+      with:
+        image-ref: 'olivia-gold:security-scan'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: 📤 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: hashFiles('trivy-results.sarif') != ''
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # ============================================================================
+  # SECURITY CONFIGURATION CHECKS
+  # ============================================================================
+  config-security:
+    name: ⚙️ Security Configuration Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔍 Check for sensitive files
+      run: |
+        echo "🔍 Checking for sensitive files..."
+        
+        # Check for common sensitive files
+        sensitive_files=(
+          ".env"
+          ".env.local"
+          ".env.production"
+          "*.key"
+          "*.pem"
+          "*.p12"
+          "*.pfx"
+          "id_rsa"
+          "id_dsa"
+          "config.json"
+        )
+        
+        found_sensitive=false
+        for pattern in "${sensitive_files[@]}"; do
+          if find . -name "$pattern" -not -path "./node_modules/*" -not -path "./.git/*" | grep -q .; then
+            echo "⚠️ Found potentially sensitive file pattern: $pattern"
+            find . -name "$pattern" -not -path "./node_modules/*" -not -path "./.git/*"
+            found_sensitive=true
+          fi
+        done
+        
+        if [ "$found_sensitive" = true ]; then
+          echo "❌ Sensitive files detected in repository"
+          exit 1
+        else
+          echo "✅ No sensitive files detected"
+        fi
+
+    - name: 🔍 Check security headers configuration
+      run: |
+        echo "🔍 Checking security headers configuration..."
+        
+        # Check for security middleware in backend
+        if [ -f "backend/src/server.ts" ]; then
+          echo "Checking backend security configuration..."
+          
+          if grep -q "helmet" backend/src/server.ts; then
+            echo "✅ Helmet security middleware found"
+          else
+            echo "⚠️ Helmet security middleware not found"
+          fi
+          
+          if grep -q "cors" backend/src/server.ts; then
+            echo "✅ CORS configuration found"
+          else
+            echo "⚠️ CORS configuration not found"
+          fi
+          
+          if grep -q "rateLimit" backend/src/server.ts; then
+            echo "✅ Rate limiting found"
+          else
+            echo "⚠️ Rate limiting not found"
+          fi
+        fi
+
+    - name: 🔍 Check environment variable usage
+      run: |
+        echo "🔍 Checking environment variable security..."
+        
+        # Check for hardcoded secrets
+        if grep -r "password.*=" --include="*.ts" --include="*.js" --include="*.tsx" --include="*.jsx" . | grep -v node_modules | grep -v ".git"; then
+          echo "⚠️ Potential hardcoded passwords found"
+        fi
+        
+        if grep -r "secret.*=" --include="*.ts" --include="*.js" --include="*.tsx" --include="*.jsx" . | grep -v node_modules | grep -v ".git" | grep -v "process.env"; then
+          echo "⚠️ Potential hardcoded secrets found"
+        fi
+        
+        echo "✅ Environment variable security check completed"
+
+  # ============================================================================
+  # SECURITY SUMMARY REPORT
+  # ============================================================================
+  security-summary:
+    name: 📊 Security Summary Report
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, code-security, codeql, secret-scan, config-security]
+    if: always()
+    
+    steps:
+    - name: 📥 Download audit reports
+      uses: actions/download-artifact@v3
+      with:
+        path: security-reports/
+      continue-on-error: true
+
+    - name: 📊 Generate security summary
+      run: |
+        echo "# 🔒 Security Scan Summary" > security-summary.md
+        echo "" >> security-summary.md
+        echo "## 📅 Scan Date: $(date)" >> security-summary.md
+        echo "" >> security-summary.md
+        echo "## 📊 Scan Results:" >> security-summary.md
+        echo "" >> security-summary.md
+        
+        # Check job results
+        if [[ "${{ needs.dependency-scan.result }}" == "success" ]]; then
+          echo "✅ **Dependency Scan**: PASSED" >> security-summary.md
+        else
+          echo "❌ **Dependency Scan**: FAILED" >> security-summary.md
+        fi
+        
+        if [[ "${{ needs.code-security.result }}" == "success" ]]; then
+          echo "✅ **Code Security Analysis**: PASSED" >> security-summary.md
+        else
+          echo "❌ **Code Security Analysis**: FAILED" >> security-summary.md
+        fi
+        
+        if [[ "${{ needs.codeql.result }}" == "success" ]]; then
+          echo "✅ **CodeQL Analysis**: PASSED" >> security-summary.md
+        else
+          echo "❌ **CodeQL Analysis**: FAILED" >> security-summary.md
+        fi
+        
+        if [[ "${{ needs.secret-scan.result }}" == "success" ]]; then
+          echo "✅ **Secret Scanning**: PASSED" >> security-summary.md
+        else
+          echo "❌ **Secret Scanning**: FAILED" >> security-summary.md
+        fi
+        
+        if [[ "${{ needs.config-security.result }}" == "success" ]]; then
+          echo "✅ **Configuration Security**: PASSED" >> security-summary.md
+        else
+          echo "❌ **Configuration Security**: FAILED" >> security-summary.md
+        fi
+        
+        echo "" >> security-summary.md
+        echo "## 🔧 Recommendations:" >> security-summary.md
+        echo "" >> security-summary.md
+        echo "- Keep dependencies updated regularly" >> security-summary.md
+        echo "- Review and address any security findings" >> security-summary.md
+        echo "- Monitor security alerts and advisories" >> security-summary.md
+        echo "- Ensure secrets are properly managed" >> security-summary.md
+        echo "" >> security-summary.md
+        echo "---" >> security-summary.md
+        echo "*Generated by Olivia Gold Security Pipeline*" >> security-summary.md
+        
+        echo "📊 Security Summary Generated:"
+        cat security-summary.md
+
+    - name: 📤 Upload security summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-summary-report
+        path: security-summary.md
+        retention-days: 90
+
+    - name: 💬 Comment PR with security summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('security-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 🔒 Security Scan Results\n\n${summary}`
+          });

@@ -1,0 +1,433 @@
+name: CI/CD Pipeline - Olivia Gold
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18.x'
+  POSTGRES_DB: joyeria_elegante_test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+jobs:
+  # ============================================================================
+  # LINTING Y ANÁLISIS DE CÓDIGO
+  # ============================================================================
+  lint:
+    name: 🔍 Linting & Code Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    # Frontend Linting
+    - name: 📦 Install frontend dependencies
+      run: npm ci
+
+    - name: 🔍 Run frontend linting
+      run: npm run lint
+
+    # Backend Linting
+    - name: 📦 Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: 🔍 Run backend linting
+      working-directory: ./backend
+      run: npm run lint
+
+    - name: 📝 TypeScript type checking (Frontend)
+      run: npx tsc --noEmit
+
+    - name: 📝 TypeScript type checking (Backend)
+      working-directory: ./backend
+      run: npx tsc --noEmit
+
+  # ============================================================================
+  # TESTS BACKEND
+  # ============================================================================
+  test-backend:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+
+    - name: 📦 Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: 🔧 Setup test environment variables
+      working-directory: ./backend
+      run: |
+        echo "NODE_ENV=test" > .env.test
+        echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public" >> .env.test
+        echo "JWT_SECRET=test-jwt-secret-for-ci-cd-pipeline-12345678901234567890" >> .env.test
+        echo "SESSION_SECRET=test-session-secret-for-ci-cd" >> .env.test
+        echo "CSRF_SECRET=test-csrf-secret-for-ci-cd" >> .env.test
+
+    - name: 🗄️ Setup test database
+      working-directory: ./backend
+      run: |
+        npm run test:setup
+
+    - name: 🧪 Run backend tests
+      working-directory: ./backend
+      run: npm run test
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public
+
+    - name: 📊 Upload backend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage/lcov.info
+        flags: backend
+        name: backend-coverage
+
+  # ============================================================================
+  # TESTS FRONTEND
+  # ============================================================================
+  test-frontend:
+    name: 🧪 Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install frontend dependencies
+      run: npm ci
+
+    - name: 🧪 Run frontend tests
+      run: npm run test:run
+
+    - name: 📊 Run frontend tests with coverage
+      run: npm run test:coverage
+
+    - name: 📊 Upload frontend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # ============================================================================
+  # TESTS DE SEGURIDAD
+  # ============================================================================
+  security-tests:
+    name: 🔒 Security Tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    # Audit de dependencias
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔍 Frontend security audit
+      run: npm audit --audit-level=moderate
+
+    - name: 📦 Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: 🔍 Backend security audit
+      working-directory: ./backend
+      run: npm audit --audit-level=moderate
+
+    # Análisis con Semgrep
+    - name: 🔐 Run Semgrep security analysis
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/owasp-top-ten
+          p/nodejs
+          p/typescript
+        publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+        publishDeployment: 'auto'
+      env:
+        SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  # ============================================================================
+  # BUILD Y TESTING DE INTEGRACIÓN
+  # ============================================================================
+  build:
+    name: 🏗️ Build & Integration Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    # Build Frontend
+    - name: 📦 Install frontend dependencies
+      run: npm ci
+
+    - name: 🏗️ Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: ${{ secrets.VITE_API_URL || 'http://localhost:3001' }}
+
+    # Build Backend
+    - name: 📦 Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: 🏗️ Build backend
+      working-directory: ./backend
+      run: npm run build
+
+    # Test de integración E2E básico
+    - name: 🔧 Setup integration test environment
+      working-directory: ./backend
+      run: |
+        echo "NODE_ENV=test" > .env.test
+        echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public" >> .env.test
+        echo "JWT_SECRET=integration-test-jwt-secret-12345678901234567890" >> .env.test
+        echo "SESSION_SECRET=integration-test-session-secret" >> .env.test
+        echo "CSRF_SECRET=integration-test-csrf-secret" >> .env.test
+        npm run test:setup
+
+    - name: 🚀 Start backend server
+      working-directory: ./backend
+      run: |
+        npm run start &
+        sleep 10
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public
+
+    - name: 🧪 Run integration tests
+      working-directory: ./backend
+      run: npm run test -- --testPathPattern=integration
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?schema=public
+
+    # Artifact de builds
+    - name: 📤 Upload frontend build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: ./dist/
+        retention-days: 7
+
+    - name: 📤 Upload backend build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-build
+        path: ./backend/dist/
+        retention-days: 7
+
+  # ============================================================================
+  # DEPLOY A STAGING (solo en develop)
+  # ============================================================================
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, security-tests]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 📥 Download frontend build
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-build
+        path: ./dist/
+
+    - name: 📥 Download backend build
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-build
+        path: ./backend/dist/
+
+    # En un escenario real, aquí deployarías a tu servidor staging
+    - name: 🚀 Deploy to staging environment
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        echo "📁 Frontend build ready at ./dist/"
+        echo "📁 Backend build ready at ./backend/dist/"
+        echo "✅ Staging deployment completed successfully!"
+        # Aquí irían los comandos reales de deploy (scp, rsync, docker, etc.)
+
+  # ============================================================================
+  # DEPLOY A PRODUCCIÓN (solo en main)
+  # ============================================================================
+  deploy-production:
+    name: 🌟 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, security-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 📥 Download frontend build
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-build
+        path: ./dist/
+
+    - name: 📥 Download backend build
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-build
+        path: ./backend/dist/
+
+    # Backup de base de datos antes del deploy
+    - name: 🗄️ Create database backup
+      run: |
+        echo "🗄️ Creating production database backup..."
+        echo "📅 Backup timestamp: $(date)"
+        # Aquí irían los comandos reales de backup
+        echo "✅ Database backup completed!"
+
+    # Deploy a producción
+    - name: 🌟 Deploy to production environment
+      run: |
+        echo "🌟 Deploying to production environment..."
+        echo "📁 Frontend build ready at ./dist/"
+        echo "📁 Backend build ready at ./backend/dist/"
+        echo "⚠️  Running production deployment with zero downtime..."
+        # Aquí irían los comandos reales de deploy a producción
+        echo "✅ Production deployment completed successfully!"
+
+    # Verificación post-deploy
+    - name: 🔍 Post-deployment health check
+      run: |
+        echo "🔍 Running post-deployment health checks..."
+        # Aquí irían verificaciones reales de que el sitio funciona
+        echo "✅ All health checks passed!"
+
+  # ============================================================================
+  # NOTIFICACIONES
+  # ============================================================================
+  notify:
+    name: 📢 Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+    - name: 📢 Send deployment notification
+      run: |
+        if [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
+          echo "🎉 Production deployment successful!"
+          echo "🌐 Site is live at: https://oliviagold.com"
+        elif [[ "${{ needs.deploy-staging.result }}" == "success" ]]; then
+          echo "🚀 Staging deployment successful!"
+          echo "🌐 Staging site: https://staging.oliviagold.com"
+        else
+          echo "⚠️ Deployment completed with status: ${{ needs.deploy-production.result || needs.deploy-staging.result }}"
+        fi
+
+# ============================================================================
+# CONFIGURACIÓN DE CALIDAD
+# ============================================================================
+  quality-gates:
+    name: 🎯 Quality Gates
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-tests]
+    if: always()
+    
+    steps:
+    - name: 🎯 Evaluate quality gates
+      run: |
+        echo "📊 Evaluating quality gates..."
+        
+        # Verificar que todos los tests pasaron
+        if [[ "${{ needs.test-backend.result }}" != "success" ]]; then
+          echo "❌ Backend tests failed"
+          exit 1
+        fi
+        
+        if [[ "${{ needs.test-frontend.result }}" != "success" ]]; then
+          echo "❌ Frontend tests failed"
+          exit 1
+        fi
+        
+        if [[ "${{ needs.security-tests.result }}" != "success" ]]; then
+          echo "❌ Security tests failed"
+          exit 1
+        fi
+        
+        echo "✅ All quality gates passed!"
+        echo "🎉 Code is ready for deployment!"

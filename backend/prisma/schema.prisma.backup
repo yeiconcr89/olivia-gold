@@ -1,0 +1,438 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USUARIOS Y AUTENTICACIÓN
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+  googleId  String?  @unique
+  role      UserRole @default(CUSTOMER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  profile   UserProfile?
+  orders    Order[]
+  reviews   Review[]
+  auditLogs AuditLog[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  name        String
+  phone       String?
+  avatar      String?
+  birthDate   DateTime?
+  preferences String[] // Categorías preferidas
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  CUSTOMER
+}
+
+// ============================================================================
+// PRODUCTOS
+// ============================================================================
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  price         Decimal  @db.Decimal(10, 2)
+  originalPrice Decimal? @db.Decimal(10, 2)
+  category      String
+  subcategory   String
+  description   String   @db.Text
+  materials     String
+  dimensions    String
+  care          String   @db.Text
+  inStock       Boolean  @default(false)
+  featured      Boolean  @default(false)
+  rating        Decimal  @default(0) @db.Decimal(3, 2)
+  reviewCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relaciones
+  images        ProductImage[]
+  tags          ProductTag[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+  inventory     Inventory?
+  movements     InventoryMovement[]
+
+  @@index([name])
+  @@index([category])
+  @@index([featured])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  altText   String?
+  isPrimary Boolean @default(false)
+  order     Int     @default(0)
+
+  // Relaciones
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductTag {
+  id        String @id @default(cuid())
+  productId String
+  tag       String
+
+  // Relaciones
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_tags")
+}
+
+// ============================================================================
+// CLIENTES
+// ============================================================================
+
+model Customer {
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  phone            String
+  status           CustomerStatus @default(ACTIVE)
+  registrationDate DateTime @default(now())
+  lastPurchase     DateTime?
+  totalOrders      Int      @default(0)
+  totalSpent       Decimal  @default(0) @db.Decimal(10, 2)
+  wishlistItems    Int      @default(0)
+  notes            String?  @db.Text
+  birthDate        DateTime?
+  preferences      String[] // Categorías preferidas
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relaciones
+  addresses CustomerAddress[]
+  orders    Order[]
+
+  @@index([name])
+  @@index([status])
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id         String  @id @default(cuid())
+  customerId String
+  street     String
+  city       String
+  state      String
+  zipCode    String
+  country    String  @default("Colombia")
+  isDefault  Boolean @default(false)
+
+  // Relaciones
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_addresses")
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  VIP
+}
+
+// ============================================================================
+// PEDIDOS
+// ============================================================================
+
+model Order {
+  id                String      @id @default(cuid())
+  customerId        String?
+  userId            String?
+  customerName      String
+  customerEmail     String
+  customerPhone     String
+  total             Decimal     @db.Decimal(10, 2)
+  status            OrderStatus @default(PENDING)
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentMethod     String
+  orderDate         DateTime    @default(now())
+  estimatedDelivery DateTime?
+  trackingNumber    String?
+  notes             String?     @db.Text
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relaciones
+  customer        Customer?       @relation(fields: [customerId], references: [id])
+  user            User?           @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  shippingAddress ShippingAddress?
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([orderDate])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  size      String?
+
+  // Relaciones
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model ShippingAddress {
+  id      String @id @default(cuid())
+  orderId String @unique
+  street  String
+  city    String
+  state   String
+  zipCode String
+  country String @default("Colombia")
+
+  // Relaciones
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("shipping_addresses")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// ============================================================================
+// INVENTARIO
+// ============================================================================
+
+model Inventory {
+  id              String   @id @default(cuid())
+  productId       String   @unique
+  quantity        Int      @default(0)
+  reservedQuantity Int     @default(0)
+  minQuantity     Int      @default(5)
+  maxQuantity     Int?
+  location        String?
+  lastChecked     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relaciones
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("inventory")
+}
+
+model InventoryMovement {
+  id          String   @id @default(cuid())
+  productId   String
+  quantity    Int
+  type        InventoryMovementType
+  reason      String
+  previousQuantity Int
+  newQuantity Int
+  createdAt   DateTime @default(now())
+  createdBy   String
+
+  // Relaciones
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@map("inventory_movements")
+}
+
+enum InventoryMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RESERVED
+  RELEASED
+}
+
+// ============================================================================
+// REVIEWS
+// ============================================================================
+
+model Review {
+  id          String      @id @default(cuid())
+  productId   String
+  customerId  String?
+  userId      String?
+  rating      Int         // 1-5
+  title       String
+  comment     String      @db.Text
+  date        DateTime    @default(now())
+  verified    Boolean     @default(false)
+  helpful     Int         @default(0)
+  notHelpful  Int         @default(0)
+  status      ReviewStatus @default(PENDING)
+
+  // Relaciones
+  product  Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user     User?           @relation(fields: [userId], references: [id])
+  response ReviewResponse?
+
+  @@index([status])
+  @@map("reviews")
+}
+
+model ReviewResponse {
+  id       String   @id @default(cuid())
+  reviewId String   @unique
+  text     String   @db.Text
+  date     DateTime @default(now())
+  author   String
+
+  // Relaciones
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_responses")
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ============================================================================
+// SEO
+// ============================================================================
+
+model SEOPage {
+  id              String    @id @default(cuid())
+  url             String    @unique
+  title           String
+  metaDescription String
+  keywords        String[]
+  h1              String
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  status          SEOStatus @default(NEEDS_WORK)
+  score           Int       @default(0)
+  issues          String[]
+  lastUpdated     DateTime  @updatedAt
+  createdAt       DateTime  @default(now())
+
+  @@map("seo_pages")
+}
+
+enum SEOStatus {
+  OPTIMIZED
+  NEEDS_WORK
+  POOR
+}
+
+// ============================================================================
+// SISTEMA
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  tableName  String
+  recordId   String
+  oldValues  Json?
+  newValues  Json?
+  timestamp  DateTime @default(now())
+
+  // Relaciones
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ============================================================================
+// CONTACTO
+// ============================================================================
+
+model ContactMessage {
+  id        String         @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String         @db.Text
+  status    ContactStatus  @default(PENDING)
+  notes     String?        @db.Text
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("contact_messages")
+}
+
+enum ContactStatus {
+  PENDING
+  REPLIED
+  SPAM
+  CLOSED
+}

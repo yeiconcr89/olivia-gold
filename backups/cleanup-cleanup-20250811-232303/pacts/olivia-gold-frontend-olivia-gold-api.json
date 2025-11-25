@@ -1,0 +1,252 @@
+{
+  "consumer": {
+    "name": "olivia-gold-frontend"
+  },
+  "interactions": [
+    {
+      "description": "a request for a non-existent product",
+      "providerStates": [
+        {
+          "name": "product does not exist"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/api/products/non-existent-product"
+      },
+      "response": {
+        "body": {
+          "code": "PRODUCT_NOT_FOUND",
+          "error": "Product not found",
+          "message": "Product with id non-existent-product was not found"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.error": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.message": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 404
+      }
+    },
+    {
+      "description": "a request when server has problems",
+      "providerStates": [
+        {
+          "name": "server is experiencing issues"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/api/products"
+      },
+      "response": {
+        "body": {
+          "error": "Internal Server Error",
+          "message": "An unexpected error occurred",
+          "timestamp": "2024-01-01T10:00:00Z"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.error": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.message": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.timestamp": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 500
+      }
+    },
+    {
+      "description": "a request with invalid parameters",
+      "providerStates": [
+        {
+          "name": "invalid query parameters provided"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/api/products",
+        "query": {
+          "limit": [
+            "-1"
+          ],
+          "page": [
+            "invalid"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "details": {
+            "limit": "Limit must be between 1 and 100",
+            "page": "Page must be a positive number"
+          },
+          "error": "Bad Request",
+          "message": "Invalid query parameters"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.details.limit": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.details.page": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.error": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.message": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 400
+      }
+    },
+    {
+      "description": "an unauthorized request to create a product",
+      "providerStates": [
+        {
+          "name": "user is not authenticated"
+        }
+      ],
+      "request": {
+        "body": {
+          "category": "Anillos",
+          "name": "Unauthorized Product",
+          "price": 100
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/api/products"
+      },
+      "response": {
+        "body": {
+          "error": "Unauthorized",
+          "message": "Authentication required"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.error": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.message": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 401
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "15.0.1"
+    },
+    "pactRust": {
+      "ffi": "0.4.22",
+      "models": "1.2.3"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "olivia-gold-api"
+  }
+}
