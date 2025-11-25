@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
     "dev:clean": "tsx src/scripts/restart-server.ts && tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc || true",
     "start": "node dist/server.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",

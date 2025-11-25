@@ -47,9 +47,9 @@ export const prismaOptimized = new PrismaClient({
     },
   },
   log: [
-    ...(config.logQueries ? [{ emit: 'event', level: 'query' as const }] : []),
-    { emit: 'event', level: 'error' as const },
-    { emit: 'event', level: 'warn' as const },
+    ...(config.logQueries ? [{ emit: 'event' as const, level: 'query' as const }] : []),
+    { emit: 'event' as const, level: 'error' as const },
+    { emit: 'event' as const, level: 'warn' as const },
   ],
 });
 
