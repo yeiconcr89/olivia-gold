@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, AlertCircle } from 'lucide-react';
 import { useCart } from '../../hooks/useCart';
+import { useToast } from '../../hooks/useToast';
 
 interface AddToCartButtonProps {
   productId: string;
@@ -26,9 +27,11 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   onClick
 }) => {
   const { addToCart, loading } = useCart();
+  const { error: showError } = useToast();
   const [success, setSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+  const [localError, setLocalError] = useState<string | null>(null);
+
   // Ref para prevenir double execution en React StrictMode
   const isExecutingRef = useRef(false);
   const lastExecutionRef = useRef(0);
@@ -47,20 +50,20 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     }
 
     const now = Date.now();
-    
+
     // Prevenir clicks dobles y double execution de React StrictMode
     // Aumentar el tiempo de protección a 2 segundos
     if (isProcessing || loading || isExecutingRef.current || (now - lastExecutionRef.current < 2000)) {
       console.log('⚠️ AddToCartButton: Ignorando ejecución duplicada para productId:', productId, 'isProcessing:', isProcessing, 'loading:', loading, 'isExecuting:', isExecutingRef.current, 'timeDiff:', now - lastExecutionRef.current);
       return;
     }
-    
+
     isExecutingRef.current = true;
     lastExecutionRef.current = now;
 
     console.log('🔥 AddToCartButton: handleAddToCart EJECUTANDO para productId:', productId, 'quantity:', quantity, 'timestamp:', now);
     setIsProcessing(true);
-    
+
     try {
       await addToCart({
         productId,
@@ -71,10 +74,39 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
       // Mostrar estado de éxito
       setSuccess(true);
+      setLocalError(null);
       setTimeout(() => setSuccess(false), 2000);
     } catch (error) {
       console.error('Error adding to cart:', error);
-      // El error se maneja en el hook useCart
+
+      // Mostrar error al usuario con toast
+      const errorMessage = error instanceof Error ? error.message : 'Error al agregar al carrito';
+      setLocalError(errorMessage);
+
+      // Mostrar toast con mensaje específico
+      if (errorMessage.includes('0 unidades disponibles')) {
+        showError(
+          'Producto sin stock',
+          'Este producto está agotado. Por favor, contacta al administrador o elige otro producto.',
+          7000
+        );
+      } else if (errorMessage.includes('unidades disponibles')) {
+        // Extraer número de unidades del mensaje si es posible
+        showError(
+          'Stock limitado',
+          errorMessage,
+          7000
+        );
+      } else {
+        showError(
+          'Error al agregar',
+          errorMessage,
+          5000
+        );
+      }
+
+      // Limpiar error local después de un tiempo
+      setTimeout(() => setLocalError(null), 3000);
     } finally {
       setIsProcessing(false);
       // Reset el flag después de un delay más largo para prevenir duplicados
@@ -86,7 +118,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   const getButtonClasses = () => {
     const baseClasses = 'w-full flex items-center justify-center space-x-2 font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-4 py-2 text-base',
@@ -119,6 +151,11 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         <>
           <Check className="w-4 h-4" />
           <span>¡Agregado!</span>
+        </>
+      ) : localError ? (
+        <>
+          <AlertCircle className="w-4 h-4" />
+          <span className="truncate">Sin stock</span>
         </>
       ) : (
         <>
