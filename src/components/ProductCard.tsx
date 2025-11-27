@@ -11,7 +11,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
-  
+
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const formatPrice = (price: number) => {
@@ -22,7 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
     }).format(price);
   };
 
-  const discountPercentage = product.originalPrice 
+  const discountPercentage = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
@@ -39,20 +39,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
   };
 
   return (
-    <div 
+    <div
       className="group relative bg-white rounded-lg overflow-hidden transition-shadow duration-300 hover:shadow-xl border border-transparent hover:border-amber-300"
       onClick={handleQuickView}
     >
-      {/* Image Container */}
-      <div className="relative overflow-hidden aspect-w-1 aspect-h-1">
+      {/* Image Container - Optimized aspect ratio */}
+      <div className="relative overflow-hidden aspect-[4/5]">
         <ProductImage
           src={product.images[0]}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           width={300}
-          height={300}
+          height={375}
         />
-        
+
         {/* Out of Stock Overlay */}
         {!product.inStock && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
@@ -79,16 +79,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
         {/* Wishlist button */}
         <button
           onClick={handleToggleWishlist}
-          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 backdrop-blur-sm ${
-            isInWishlist(product.id) 
-              ? 'bg-amber-500/90 text-white shadow-lg' 
+          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 backdrop-blur-sm ${isInWishlist(product.id)
+              ? 'bg-amber-500/90 text-white shadow-lg'
               : 'bg-white/90 text-gray-700 hover:bg-white'
-          } hover:scale-110 shadow-md`}
+            } hover:scale-110 shadow-md`}
           aria-label="Wishlist"
         >
-          <Heart className={`h-5 w-5 ${
-            isInWishlist(product.id) ? 'fill-current' : ''
-          }`} />
+          <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-current' : ''
+            }`} />
         </button>
       </div>
 
@@ -129,16 +127,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
         </div>
       </div>
 
-      {/* Add to Cart Button (always visible) */}
+      {/* Add to Cart Button (always visible for all products) */}
       <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/95 backdrop-blur-sm border-t border-gray-100">
-        {(['anillos', 'pulseras'].includes(product.category)) ? (
+        {/* Solo anillos y pulseras requieren selección de talla */}
+        {(['anillos', 'pulseras'].includes(product.category.toLowerCase())) ? (
           <button
             onClick={handleQuickView}
             disabled={!product.inStock}
             className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-600 text-white hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
           >
             <ShoppingCart className="w-4 h-4" />
-            <span>Agregar al Carrito</span>
+            <span>Seleccionar Talla</span>
           </button>
         ) : (
           <AddToCartButton
