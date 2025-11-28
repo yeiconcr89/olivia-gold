@@ -191,8 +191,8 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
     }
 
     const itemsText = cart.items.map(item =>
-      `• ${item.product.name} (${item.quantity} x $${item.product.price.toLocaleString()})`
-    ).join('\n');
+      `• ${item.product.name}\n  (${item.quantity} x ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(item.product.price)})`
+    ).join('\n\n');
 
     const total = new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -200,30 +200,31 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
       minimumFractionDigits: 0,
     }).format(cart.total);
 
-    return `¡Hola! Te comparto los detalles de mi pedido:
+    return `*¡Hola! Te comparto los detalles de mi pedido:*
 
-*Número de Pedido: ${order.orderNumber}*
+📦 *Número de Pedido:* ${order.orderNumber}
 
+*Productos:*
 ${itemsText}
 
-*Subtotal: ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.subtotal)}*
-${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.discountAmount)}*\n` : ''}
-*Envío: ${cart.shippingAmount === 0 ? 'Gratis' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.shippingAmount)}*
-*Total: ${total}*
+💰 *Resumen:*
+*Subtotal:* ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.subtotal)}
+${cart.discountAmount > 0 ? `*Descuento:* -${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.discountAmount)}\n` : ''}*Envío:* ${cart.shippingAmount === 0 ? 'Gratis' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.shippingAmount)}
+*Total:* ${total}
 
-*Mis datos de contacto:*
-👤 Nombre: ${formData.fullName}
-📱 Teléfono: ${formData.phone}
-📧 Email: ${formData.email}
-📍 Dirección: ${formData.address}, ${formData.city}
-📝 Notas: ${formData.notes || 'Ninguna'}`;
+📋 *Mis datos de contacto:*
+👤 *Nombre:* ${formData.fullName}
+📱 *Teléfono:* ${formData.phone}
+📧 *Email:* ${formData.email}
+📍 *Dirección:* ${formData.address}, ${formData.city}
+📝 *Notas:* ${formData.notes || 'Ninguna'}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const phoneNumber = '+573123456789'; // Reemplaza con tu número de WhatsApp
+        const phoneNumber = '573153420703'; // Número principal de pedidos
         const message = encodeURIComponent(await generateWhatsAppMessage());
         if (message) {
           window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
