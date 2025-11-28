@@ -207,22 +207,22 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
 
     return `*¡Hola! Te comparto los detalles de mi pedido:*
 
-📦 *Número de Pedido:* ${order.orderNumber}
+\u{1F4E6} *Número de Pedido:* ${order.orderNumber}
 
 *Productos:*
 ${itemsText}
 
-💰 *Resumen:*
+\u{1F4B0} *Resumen:*
 *Subtotal:* ${formatCurrency(cart.subtotal)}
 ${cart.discountAmount > 0 ? `*Descuento:* -${formatCurrency(cart.discountAmount)}\n` : ''}*Envío:* ${cart.shippingAmount === 0 ? 'Gratis' : formatCurrency(cart.shippingAmount)}
 *Total:* ${total}
 
-📋 *Mis datos de contacto:*
-👤 *Nombre:* ${formData.fullName}
-📱 *Teléfono:* ${formData.phone}
-📧 *Email:* ${formData.email}
-📍 *Dirección:* ${formData.address}, ${formData.city}
-📝 *Notas:* ${formData.notes || 'Ninguna'}`;
+\u{1F4CB} *Mis datos de contacto:*
+\u{1F464} *Nombre:* ${formData.fullName}
+\u{1F4F1} *Teléfono:* ${formData.phone}
+\u{1F4E7} *Email:* ${formData.email}
+\u{1F4CD} *Dirección:* ${formData.address}, ${formData.city}
+\u{1F4DD} *Notas:* ${formData.notes || 'Ninguna'}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
