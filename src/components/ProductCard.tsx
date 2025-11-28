@@ -44,13 +44,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
       onClick={handleQuickView}
     >
       {/* Image Container - Optimized aspect ratio */}
-      <div className="relative overflow-hidden aspect-[4/5]">
+      <div className="relative overflow-hidden aspect-[3/4]">
         <ProductImage
           src={product.images[0]}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          width={300}
-          height={375}
+          width={280}
+          height={373}
         />
 
         {/* Out of Stock Overlay */}
@@ -91,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
       </div>
 
       {/* Content */}
-      <div className="p-3 pb-16">
+      <div className="p-2.5 pb-14">
         <h3 className="text-sm font-semibold text-gray-800 truncate mb-1">
           {product.name}
         </h3>
@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
       </div>
 
       {/* Add to Cart Button (always visible for all products) */}
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/95 backdrop-blur-sm border-t border-gray-100">
+      <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-white/95 backdrop-blur-sm border-t border-gray-100">
         {/* Solo anillos y pulseras requieren selección de talla */}
         {/* Para anillos y pulseras, usamos el mismo estilo de botón pero abrimos el modal */}
         {(['anillos', 'pulseras'].includes(product.category.toLowerCase())) ? (
