@@ -15,7 +15,9 @@ interface HeaderProps {
   onCategoryChange: (category: string) => void;
   onSearchChange: (search: string) => void;
   onWishlistClick?: () => void; // Nueva prop
+  /** @deprecated Use AuthContext instead */
   user?: User;
+  /** @deprecated Use AuthContext instead */
   authMethod?: 'email' | 'google' | null;
   onLogin?: () => void;
   onLogout?: () => void;
@@ -164,9 +166,9 @@ const Header: React.FC<HeaderProps> = ({
                 />
               )}
 
-              {user ? (
+              {authUser ? (
                 <UserDropdown
-                  user={user}
+                  user={authUser}
                   authMethod={authMethod}
                   onLogout={() => onLogout && onLogout()}
                 />

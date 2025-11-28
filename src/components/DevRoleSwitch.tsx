@@ -7,9 +7,10 @@ import type { User as UserType } from '../types';
 
 interface DevRoleSwitchProps {
   currentRole: 'admin' | 'client';
+  userName?: string;
 }
 
-const DevRoleSwitch: React.FC<DevRoleSwitchProps> = ({ currentRole }) => {
+const DevRoleSwitch: React.FC<DevRoleSwitchProps> = ({ currentRole, userName }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, user } = useAuth();
@@ -28,23 +29,23 @@ const DevRoleSwitch: React.FC<DevRoleSwitchProps> = ({ currentRole }) => {
   const quickAdminLogin = async () => {
     const adminEmail = import.meta.env.VITE_DEV_ADMIN_EMAIL || 'admin@joyceriaelegante.com';
     const adminPassword = import.meta.env.VITE_DEV_ADMIN_PASSWORD || 'admin123';
-    
+
     try {
       // Hacer login real con el API
-      const data = await apiRequest<{user: UserType, token: string}>(API_CONFIG.ENDPOINTS.AUTH.LOGIN, {
+      const data = await apiRequest<{ user: UserType, token: string }>(API_CONFIG.ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         body: JSON.stringify({ email: adminEmail, password: adminPassword })
       });
-      
+
       // Usar la función login del contexto para guardar el estado
       await login(data.user, data.token, 'email');
       navigate('/admin');
     } catch (error: unknown) {
       console.error('Error en login rápido:', error);
       // Mostrar el error de forma visual
-      const errorMessage = (error as Error & { response?: { data?: { error?: string } } }).response?.data?.error || 
-                           (error as Error).message || 
-                           'Credenciales incorrectas';
+      const errorMessage = (error as Error & { response?: { data?: { error?: string } } }).response?.data?.error ||
+        (error as Error).message ||
+        'Credenciales incorrectas';
       alert(`Error de login: ${errorMessage}\n\nCredenciales usadas: ${adminEmail}\n\nVerifica que este usuario exista en tu base de datos o configura las variables VITE_DEV_ADMIN_EMAIL y VITE_DEV_ADMIN_PASSWORD`);
     }
   };
@@ -66,7 +67,7 @@ const DevRoleSwitch: React.FC<DevRoleSwitchProps> = ({ currentRole }) => {
               ) : (
                 <>
                   <User className="h-3 w-3 text-blue-600" />
-                  <span className="text-blue-700 font-medium">Cliente</span>
+                  <span className="text-blue-700 font-medium">Cliente {userName ? `(${userName})` : ''}</span>
                 </>
               )}
             </>
@@ -77,7 +78,7 @@ const DevRoleSwitch: React.FC<DevRoleSwitchProps> = ({ currentRole }) => {
             </>
           )}
         </div>
-        
+
         {/* Botón principal */}
         {!isOnAdminPage ? (
           <button
