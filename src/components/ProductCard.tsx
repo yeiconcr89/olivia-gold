@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 import { Product } from '../types';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductImage } from './OptimizedImage';
@@ -130,15 +130,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
       {/* Add to Cart Button (always visible for all products) */}
       <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/95 backdrop-blur-sm border-t border-gray-100">
         {/* Solo anillos y pulseras requieren selección de talla */}
+        {/* Para anillos y pulseras, usamos el mismo estilo de botón pero abrimos el modal */}
         {(['anillos', 'pulseras'].includes(product.category.toLowerCase())) ? (
-          <button
-            onClick={handleQuickView}
+          <AddToCartButton
+            productId={product.id}
+            onClick={() => {
+              // Llamamos a handleQuickView simulando un evento si es necesario, o adaptamos handleQuickView
+              // Como handleQuickView espera un evento, creamos uno sintético o modificamos handleQuickView
+              // Mejor opción: pasar una función vacía que llame a onQuickView directamente
+              onQuickView?.(product);
+            }}
             disabled={!product.inStock}
-            className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-600 text-white hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span>Seleccionar Talla</span>
-          </button>
+            variant="primary"
+            size_button="sm"
+          />
         ) : (
           <AddToCartButton
             productId={product.id}
