@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useCart } from '../../hooks/useCart';
+import { API_CONFIG, apiRequest } from '../../config/api';
+import { Order } from '../../types';
 import { ShoppingBag, X, Plus, Minus, Trash2, Tag, ShoppingCart as CartIcon, ArrowLeft, User, Phone, Mail, MapPin } from 'lucide-react';
 
 interface ShoppingCartProps {
@@ -21,10 +23,10 @@ const Tooltip: React.FC<{ message: string; show: boolean }> = ({ message, show }
   );
 }
 
-const ShoppingCart: React.FC<ShoppingCartProps> = ({ 
-  isOpen, 
-  onClose, 
-  onCheckout 
+const ShoppingCart: React.FC<ShoppingCartProps> = ({
+  isOpen,
+  onClose,
+  onCheckout
 }) => {
   const {
     cart,
@@ -92,31 +94,31 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!formData.fullName.trim()) {
       errors.fullName = 'El nombre completo es obligatorio';
     }
-    
+
     if (!formData.phone.trim()) {
       errors.phone = 'El teléfono es obligatorio';
     } else if (!/^[0-9]{10,15}$/.test(formData.phone)) {
       errors.phone = 'Ingresa un número de teléfono válido';
     }
-    
+
     if (!formData.email.trim()) {
       errors.email = 'El correo electrónico es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Ingresa un correo electrónico válido';
     }
-    
+
     if (!formData.address.trim()) {
       errors.address = 'La dirección es obligatoria';
     }
-    
+
     if (!formData.city.trim()) {
       errors.city = 'La ciudad es obligatoria';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -127,7 +129,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
       ...prev,
       [name]: value
     }));
-    
+
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors(prev => {
         const newErrors = { ...prev };
@@ -137,9 +139,9 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
     }
   };
 
-  const createOrder = async () => {
-    if (!cart) return '';
-    
+  const createOrder = async (): Promise<Order> => {
+    if (!cart) throw new Error('El carrito está vacío');
+
     try {
       const orderData = {
         customerName: formData.fullName,
@@ -164,20 +166,13 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
         notes: formData.notes || undefined
       };
 
-      const response = await fetch('/api/orders', {
+      // Usar apiRequest y la configuración centralizada para asegurar la URL correcta en producción
+      const response = await apiRequest<{ message: string; order: Order }>(API_CONFIG.ENDPOINTS.ORDERS.CREATE, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(orderData)
       });
 
-      if (!response.ok) {
-        throw new Error('Error al crear el pedido');
-      }
-
-      const order = await response.json();
-      return order;
+      return response.order;
     } catch (error) {
       console.error('Error creating order:', error);
       throw error;
@@ -186,7 +181,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
 
   const generateWhatsAppMessage = async () => {
     if (!cart) return '';
-    
+
     let order;
     try {
       order = await createOrder();
@@ -194,17 +189,17 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
       alert('Error al procesar el pedido. Por favor intenta de nuevo.');
       return '';
     }
-    
-    const itemsText = cart.items.map(item => 
+
+    const itemsText = cart.items.map(item =>
       `• ${item.product.name} (${item.quantity} x $${item.product.price.toLocaleString()})`
     ).join('\n');
-    
+
     const total = new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
       minimumFractionDigits: 0,
     }).format(cart.total);
-    
+
     return `¡Hola! Te comparto los detalles de mi pedido:
 
 *Número de Pedido: ${order.orderNumber}*
@@ -241,7 +236,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
       }
     }
   };
-  
+
   const handleCheckout = () => {
     setShowCustomerForm(true);
   };
@@ -251,11 +246,11 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
   return (
     <>
       {/* Overlay */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity"
         onClick={onClose}
       />
-      
+
       {/* Cart Panel */}
       <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-xl z-50 transform transition-transform overflow-hidden flex flex-col">
         {/* Header */}
@@ -330,7 +325,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                       alt={item.product.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
-                    
+
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate">
                         {item.product.name}
@@ -348,7 +343,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                           Talla: {item.size}
                         </p>
                       )}
-                      
+
                       {/* Quantity Controls */}
                       <div className="flex flex-col space-y-1">
                         <div className="flex items-center space-x-2">
@@ -359,11 +354,11 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          
+
                           <span className="w-8 text-center font-medium">
                             {item.quantity}
                           </span>
-                          
+
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                             className="w-8 h-8 flex items-center justify-center rounded-full border hover:bg-gray-100 disabled:opacity-50"
@@ -382,7 +377,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
                       <p className="font-medium text-gray-900">
                         {new Intl.NumberFormat('es-CO', {
@@ -436,7 +431,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                       maximumFractionDigits: 0,
                     }).format(cart?.subtotal || 0)}</span>
                   </div>
-                  
+
                   {cart && cart.discountAmount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Descuento</span>
@@ -448,7 +443,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                       }).format(cart.discountAmount)}</span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between">
                     <span className="text-gray-600">Envío</span>
                     <span>
@@ -460,7 +455,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                       }).format(cart?.shippingAmount || 0)}
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-gray-600">Impuestos</span>
                     <span>{new Intl.NumberFormat('es-CO', {
@@ -470,7 +465,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                       maximumFractionDigits: 0,
                     }).format(cart?.taxAmount || 0)}</span>
                   </div>
-                  
+
                   <div className="border-t pt-2 flex justify-between text-lg font-semibold">
                     <span>Total</span>
                     <span>{new Intl.NumberFormat('es-CO', {
@@ -492,10 +487,10 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                     <ArrowLeft className="w-4 h-4 mr-1" />
                     Volver al carrito
                   </button>
-                  
+
                   <h3 className="text-lg font-semibold mb-4">Datos de contacto</h3>
                   <p className="text-sm text-gray-600 mb-6">Por favor completa tus datos para procesar tu pedido</p>
-                  
+
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -519,7 +514,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         <p className="mt-1 text-sm text-red-600">{formErrors.fullName}</p>
                       )}
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
@@ -543,7 +538,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                           <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
                         )}
                       </div>
-                      
+
                       <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                           Correo electrónico <span className="text-red-500">*</span>
@@ -567,7 +562,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
@@ -586,7 +581,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                           <p className="mt-1 text-sm text-red-600">{formErrors.city}</p>
                         )}
                       </div>
-                      
+
                       <div>
                         <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                           Dirección <span className="text-red-500">*</span>
@@ -610,7 +605,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         )}
                       </div>
                     </div>
-                    
+
                     <div>
                       <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
                         Notas adicionales (opcional)
@@ -625,7 +620,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         placeholder="Instrucciones especiales para la entrega, detalles del pedido, etc."
                       />
                     </div>
-                    
+
                     <div className="pt-2">
                       <button
                         type="submit"
@@ -633,7 +628,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                         disabled={loading}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
-                          <path d="M17.498 14.382a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h2.5zm-3.5-12.5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h2.5zm-5 3a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H6.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5h2.5z"/>
+                          <path d="M17.498 14.382a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h2.5zm-3.5-12.5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h2.5zm-5 3a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H6.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5h2.5z" />
                         </svg>
                         <span>Continuar a WhatsApp</span>
                       </button>
@@ -648,11 +643,11 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                     disabled={loading}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.498 14.382a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h2.5zm-3.5-12.5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h2.5zm-5 3a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H6.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5h2.5z"/>
+                      <path d="M17.498 14.382a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h2.5zm-3.5-12.5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-2.5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h2.5zm-5 3a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H6.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5h2.5z" />
                     </svg>
                     <span>Completar pedido</span>
                   </button>
-                
+
                   <div className="flex space-x-3">
                     <button
                       onClick={onClose}
@@ -660,7 +655,7 @@ ${cart.discountAmount > 0 ? `*Descuento: -${new Intl.NumberFormat('es-CO', { sty
                     >
                       Seguir Comprando
                     </button>
-                    
+
                     <button
                       onClick={() => clearCart()}
                       className="flex-1 border border-red-300 text-red-600 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors"
