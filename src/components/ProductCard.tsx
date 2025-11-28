@@ -44,13 +44,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
       onClick={handleQuickView}
     >
       {/* Image Container - Optimized aspect ratio */}
-      <div className="relative overflow-hidden aspect-[3/4]">
+      <div className="relative overflow-hidden aspect-square">
         <ProductImage
           src={product.images[0]}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           width={280}
-          height={373}
+          height={280}
         />
 
         {/* Out of Stock Overlay */}
