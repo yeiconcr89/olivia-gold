@@ -9,16 +9,11 @@ import Logo from './Logo';
 import UserDropdown from './UserDropdown';
 import ShoppingCart from './cart/ShoppingCart';
 import DevRoleSwitch from './DevRoleSwitch';
-import type { User } from '../types';
 
 interface HeaderProps {
   onCategoryChange: (category: string) => void;
   onSearchChange: (search: string) => void;
-  onWishlistClick?: () => void; // Nueva prop
-  /** @deprecated Use AuthContext instead */
-  user?: User;
-  /** @deprecated Use AuthContext instead */
-  authMethod?: 'email' | 'google' | null;
+  onWishlistClick?: () => void;
   onLogin?: () => void;
   onLogout?: () => void;
 }
@@ -26,16 +21,14 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   onCategoryChange,
   onSearchChange,
-  onWishlistClick, // Nueva prop
-  user,
-  authMethod,
+  onWishlistClick,
   onLogin,
   onLogout
 }) => {
   const navigate = useNavigate();
   const { getTotalItems } = useCart();
   const { wishlist } = useWishlist();
-  const { user: authUser } = useAuth();
+  const { user: authUser, logout, authMethod } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -170,7 +163,11 @@ const Header: React.FC<HeaderProps> = ({
                 <UserDropdown
                   user={authUser}
                   authMethod={authMethod}
-                  onLogout={() => onLogout && onLogout()}
+                  onLogout={async () => {
+                    await logout();
+                    if (onLogout) onLogout();
+                    navigate('/');
+                  }}
                 />
               ) : (
                 <button
@@ -257,8 +254,99 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
           {/* Navegación Móvil */}
+          {/* Navegación Móvil */}
           <nav className="px-2 py-2 space-y-1">
-            {!user && (
+            {authUser ? (
+              <>
+                <div className="px-3 py-3 border-b border-gray-100 mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      {(authUser.profile?.name || authUser.email).charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {authUser.profile?.name || 'Usuario'}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {authUser.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    navigate('/profile');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-black rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="h-5 w-5" />
+                    Mi Perfil
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate('/orders');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-black rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5" />
+                    Mis Pedidos
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    onWishlistClick?.();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-black rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-5 w-5" />
+                    Lista de Deseos
+                  </div>
+                </button>
+
+                {/* Admin Link for Mobile */}
+                {(authUser.role === 'ADMIN' || authUser.role === 'MANAGER') && (
+                  <button
+                    onClick={() => {
+                      navigate('/admin');
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-black rounded-md"
+                  >
+                    <div className="flex items-center gap-2">
+                      <UserIcon className="h-5 w-5" />
+                      Panel Admin
+                    </div>
+                  </button>
+                )}
+
+                <div className="border-t border-gray-100 my-2"></div>
+
+                <button
+                  onClick={async () => {
+                    await logout();
+                    if (onLogout) onLogout();
+                    setIsMenuOpen(false);
+                    navigate('/');
+                  }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <X className="h-5 w-5" />
+                    Cerrar Sesión
+                  </div>
+                </button>
+              </>
+            ) : (
               <button
                 onClick={() => {
                   onLogin?.();
@@ -272,22 +360,26 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
               </button>
             )}
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => {
-                  handleCategoryClick(category.id);
-                  setIsMenuOpen(false);
-                }}
-                className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md transition-colors \
-                  ${activeCategory === category.id
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-black'}`
-                }
-              >
-                {category.name}
-              </button>
-            ))}
+
+            <div className="border-t border-gray-100 my-2 pt-2">
+              <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Categorías</p>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => {
+                    handleCategoryClick(category.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md transition-colors \
+                    ${activeCategory === category.id
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-black'}`
+                  }
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
       )}
