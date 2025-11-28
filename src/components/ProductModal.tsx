@@ -16,7 +16,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
   const [quantity, setQuantity] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  
+
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
@@ -39,25 +39,25 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
 
     // Productos que requieren talla
     const requiresSizeCategories = ['anillos', 'pulseras'];
-    
+
     if (requiresSizeCategories.includes(product.category) && !selectedSize) {
       alert('Por favor selecciona una talla');
       return;
     }
-    
+
     setIsAddingToCart(true);
-    
+
     try {
       // Solo enviar size si el producto realmente la requiere
       const requiresSizeCategories = ['anillos', 'pulseras'];
       const shouldIncludeSize = requiresSizeCategories.includes(product.category);
-      
+
       console.log('🛒 ProductModal: Agregando al carrito:', {
         productId: product.id,
         quantity,
         size: shouldIncludeSize ? (selectedSize || undefined) : undefined
       });
-      
+
       // Solo enviar los datos mínimos necesarios
       const cartPayload = {
         productId: product.id,
@@ -85,16 +85,16 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
   const sizes = ['6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black bg-opacity-75 backdrop-blur-sm" onClick={onClose} />
-      
-      <div className="absolute inset-4 md:inset-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div className="flex h-full">
+
+      <div className="relative w-full max-w-5xl h-[90vh] md:h-[800px] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="flex flex-col md:flex-row h-full">
           {/* Image Section */}
-          <div className="flex-1 relative bg-elegant-50">
+          <div className="flex-1 relative bg-elegant-50 min-h-[300px] md:min-h-0">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full transition-all"
+              className="absolute top-4 right-4 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full transition-all md:hidden"
             >
               <X className="h-6 w-6 text-elegant-700" />
             </button>
@@ -104,9 +104,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                 <img
                   src={product.images[currentImageIndex]}
                   alt={product.name}
-                  className={`w-full h-full object-contain transition-transform duration-300 cursor-zoom-in ${
-                    isZoomed ? 'scale-150' : 'scale-100'
-                  }`}
+                  className={`w-full h-full object-contain transition-transform duration-300 cursor-zoom-in ${isZoomed ? 'scale-150' : 'scale-100'
+                    }`}
                   onClick={() => setIsZoomed(!isZoomed)}
                 />
 
@@ -129,7 +128,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
 
                 <button
                   onClick={() => setIsZoomed(!isZoomed)}
-                  className="absolute bottom-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 p-2 rounded-full transition-all"
+                  className="absolute bottom-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 p-2 rounded-full transition-all hidden md:block"
                 >
                   <ZoomIn className="h-5 w-5 text-elegant-700" />
                 </button>
@@ -143,9 +142,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      index === currentImageIndex ? 'bg-gold-500' : 'bg-white bg-opacity-50'
-                    }`}
+                    className={`w-3 h-3 rounded-full transition-all ${index === currentImageIndex ? 'bg-gold-500' : 'bg-white bg-opacity-50'
+                      }`}
                   />
                 ))}
               </div>
@@ -153,7 +151,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
           </div>
 
           {/* Product Details */}
-          <div className="w-96 p-8 overflow-y-auto">
+          <div className="w-full md:w-[450px] p-6 md:p-8 overflow-y-auto bg-white relative">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors hidden md:block"
+            >
+              <X className="h-6 w-6" />
+            </button>
             <div className="space-y-6">
               {/* Header */}
               <div>
@@ -171,11 +175,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.floor(product.rating) 
-                          ? 'text-gold-500 fill-current' 
-                          : 'text-elegant-300'
-                      }`}
+                      className={`h-5 w-5 ${i < Math.floor(product.rating)
+                        ? 'text-gold-500 fill-current'
+                        : 'text-elegant-300'
+                        }`}
                     />
                   ))}
                 </div>
@@ -220,11 +223,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`py-2 px-3 border rounded-lg font-lato font-semibold transition-all ${
-                          selectedSize === size
-                            ? 'border-gold-500 bg-gold-50 text-gold-700'
-                            : 'border-elegant-300 hover:border-gold-300'
-                        }`}
+                        className={`py-2 px-3 border rounded-lg font-lato font-semibold transition-all ${selectedSize === size
+                          ? 'border-gold-500 bg-gold-50 text-gold-700'
+                          : 'border-elegant-300 hover:border-gold-300'
+                          }`}
                       >
                         {size}
                       </button>
@@ -258,11 +260,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.inStock || isAddingToCart}
-                  className={`w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-lg font-lato font-bold transition-all ${
-                    product.inStock && !isAddingToCart
-                      ? 'bg-gradient-gold text-elegant-900 hover:shadow-gold transform hover:scale-105'
-                      : 'bg-elegant-200 text-elegant-500 cursor-not-allowed'
-                  }`}
+                  className={`w-full flex items-center justify-center space-x-2 py-4 px-6 rounded-lg font-lato font-bold transition-all ${product.inStock && !isAddingToCart
+                    ? 'bg-gradient-gold text-elegant-900 hover:shadow-gold transform hover:scale-105'
+                    : 'bg-elegant-200 text-elegant-500 cursor-not-allowed'
+                    }`}
                 >
                   {isAddingToCart ? (
                     <>
@@ -278,12 +279,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                 </button>
 
                 <button
-                  onClick={() => toggleWishlist(product.id)}
-                  className={`w-full flex items-center justify-center space-x-2 py-3 px-6 border-2 rounded-lg font-lato font-semibold transition-all ${
-                    isInWishlist(product.id)
-                      ? 'border-gold-500 bg-gold-50 text-gold-700'
-                      : 'border-elegant-300 text-elegant-700 hover:border-gold-500'
-                  }`}
+                  onClick={() => toggleWishlist(product)}
+                  className={`w-full flex items-center justify-center space-x-2 py-3 px-6 border-2 rounded-lg font-lato font-semibold transition-all ${isInWishlist(product.id)
+                    ? 'border-gold-500 bg-gold-50 text-gold-700'
+                    : 'border-elegant-300 text-elegant-700 hover:border-gold-500'
+                    }`}
                 >
                   <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
                   <span>{isInWishlist(product.id) ? 'En Favoritos' : 'Agregar a Favoritos'}</span>
