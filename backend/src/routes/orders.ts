@@ -193,25 +193,6 @@ router.post('/',
 );
 
 /**
- * @route   GET /api/orders/:id
- * @desc    Obtener pedido por ID (público con limitaciones)
- * @access  Public
- */
-router.get('/:id',
-  validateParams(z.object({ id: z.string().cuid() })),
-  async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const order = await orderService.getOrderById(id, true); // Acceso público
-      res.json(order);
-    } catch (error) {
-      logger.error('Error obteniendo pedido:', error);
-      throw error; // Re-lanzar el error para que sea capturado por el middleware
-    }
-  }
-);
-
-/**
  * @route   GET /api/orders/my-orders
  * @desc    Obtener pedidos del usuario autenticado
  * @access  Private
@@ -232,6 +213,25 @@ router.get('/my-orders',
     } catch (error) {
       logger.error('Error obteniendo mis pedidos:', error);
       throw error;
+    }
+  }
+);
+
+/**
+ * @route   GET /api/orders/:id
+ * @desc    Obtener pedido por ID (público con limitaciones)
+ * @access  Public
+ */
+router.get('/:id',
+  validateParams(z.object({ id: z.string().cuid() })),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const order = await orderService.getOrderById(id, true); // Acceso público
+      res.json(order);
+    } catch (error) {
+      logger.error('Error obteniendo pedido:', error);
+      throw error; // Re-lanzar el error para que sea capturado por el middleware
     }
   }
 );
