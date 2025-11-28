@@ -190,34 +190,39 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
       return '';
     }
 
+    const formatCurrency = (amount: number) => {
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount).replace(/\u00A0/g, ' ');
+    };
+
     const itemsText = cart.items.map(item =>
-      `• ${item.product.name}\n  (${item.quantity} x ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(item.product.price)})`
+      `• ${item.product.name}\n  (${item.quantity} x ${formatCurrency(item.product.price)})`
     ).join('\n\n');
 
-    const total = new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-    }).format(cart.total);
+    const total = formatCurrency(cart.total);
 
-    return `*\u00A1Hola! Te comparto los detalles de mi pedido:*
+    return `*¡Hola! Te comparto los detalles de mi pedido:*
 
-\uD83D\uDCE6 *N\u00FAmero de Pedido:* ${order.orderNumber}
+📦 *Número de Pedido:* ${order.orderNumber}
 
 *Productos:*
 ${itemsText}
 
-\uD83D\uDCB0 *Resumen:*
-*Subtotal:* ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.subtotal)}
-${cart.discountAmount > 0 ? `*Descuento:* -${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.discountAmount)}\n` : ''}*Env\u00EDo:* ${cart.shippingAmount === 0 ? 'Gratis' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.shippingAmount)}
+💰 *Resumen:*
+*Subtotal:* ${formatCurrency(cart.subtotal)}
+${cart.discountAmount > 0 ? `*Descuento:* -${formatCurrency(cart.discountAmount)}\n` : ''}*Envío:* ${cart.shippingAmount === 0 ? 'Gratis' : formatCurrency(cart.shippingAmount)}
 *Total:* ${total}
 
-\uD83D\uDCCB *Mis datos de contacto:*
-\uD83D\uDC64 *Nombre:* ${formData.fullName}
-\uD83D\uDCF1 *Tel\u00E9fono:* ${formData.phone}
-\uD83D\uDCE7 *Email:* ${formData.email}
-\uD83D\uDCCD *Direcci\u00F3n:* ${formData.address}, ${formData.city}
-\uD83D\uDCDD *Notas:* ${formData.notes || 'Ninguna'}`;
+📋 *Mis datos de contacto:*
+👤 *Nombre:* ${formData.fullName}
+📱 *Teléfono:* ${formData.phone}
+📧 *Email:* ${formData.email}
+📍 *Dirección:* ${formData.address}, ${formData.city}
+📝 *Notas:* ${formData.notes || 'Ninguna'}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -225,9 +230,15 @@ ${cart.discountAmount > 0 ? `*Descuento:* -${new Intl.NumberFormat('es-CO', { st
     if (validateForm()) {
       try {
         const phoneNumber = '573153420703'; // Número principal de pedidos
-        const message = encodeURIComponent(await generateWhatsAppMessage());
+        const message = await generateWhatsAppMessage();
+
         if (message) {
-          window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+          // Usar api.whatsapp.com es más robusto para mensajes largos y caracteres especiales
+          // Aseguramos que el mensaje esté completamente codificado para URL
+          const encodedMessage = encodeURIComponent(message);
+          const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+          window.open(whatsappUrl, '_blank');
+
           await clearCart();
           onClose();
         }
