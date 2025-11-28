@@ -200,24 +200,24 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
       minimumFractionDigits: 0,
     }).format(cart.total);
 
-    return `*¡Hola! Te comparto los detalles de mi pedido:*
+    return `*\u00A1Hola! Te comparto los detalles de mi pedido:*
 
-📦 *Número de Pedido:* ${order.orderNumber}
+\uD83D\uDCE6 *N\u00FAmero de Pedido:* ${order.orderNumber}
 
 *Productos:*
 ${itemsText}
 
-💰 *Resumen:*
+\uD83D\uDCB0 *Resumen:*
 *Subtotal:* ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.subtotal)}
-${cart.discountAmount > 0 ? `*Descuento:* -${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.discountAmount)}\n` : ''}*Envío:* ${cart.shippingAmount === 0 ? 'Gratis' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.shippingAmount)}
+${cart.discountAmount > 0 ? `*Descuento:* -${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.discountAmount)}\n` : ''}*Env\u00EDo:* ${cart.shippingAmount === 0 ? 'Gratis' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(cart.shippingAmount)}
 *Total:* ${total}
 
-📋 *Mis datos de contacto:*
-👤 *Nombre:* ${formData.fullName}
-📱 *Teléfono:* ${formData.phone}
-📧 *Email:* ${formData.email}
-📍 *Dirección:* ${formData.address}, ${formData.city}
-📝 *Notas:* ${formData.notes || 'Ninguna'}`;
+\uD83D\uDCCB *Mis datos de contacto:*
+\uD83D\uDC64 *Nombre:* ${formData.fullName}
+\uD83D\uDCF1 *Tel\u00E9fono:* ${formData.phone}
+\uD83D\uDCE7 *Email:* ${formData.email}
+\uD83D\uDCCD *Direcci\u00F3n:* ${formData.address}, ${formData.city}
+\uD83D\uDCDD *Notas:* ${formData.notes || 'Ninguna'}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
