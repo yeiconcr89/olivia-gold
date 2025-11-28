@@ -17,7 +17,7 @@ interface ProductGridProps {
 const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, category = 'all', searchTerm = '', isLoading: isLoadingProp = false }) => {
   // Si no se pasan productos como prop, usar el hook para obtenerlos
   const { products: productsFromHook, loading: loadingFromHook } = useProducts();
-  
+
   // Usar productos de props si están disponibles, sino usar los del hook
   const products = productsProp || productsFromHook;
   const isLoading = isLoadingProp || loadingFromHook;
@@ -33,7 +33,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
     if (!Array.isArray(products)) {
       return [];
     }
-    
+
     let filtered = [...products];
 
     // Filter by category
@@ -46,7 +46,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (Array.isArray(product.tags) && product.tags.some(tag => 
+        (Array.isArray(product.tags) && product.tags.some(tag =>
           typeof tag === 'string' && tag.toLowerCase().includes(searchTerm.toLowerCase())
         ))
       );
@@ -96,7 +96,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
           {[...Array(10)].map((_, index) => (
             <ProductSkeleton key={index} />
           ))}
@@ -116,7 +116,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
         <div>
           <h2 className="text-3xl font-playfair font-bold text-elegant-900 mb-2">
             {!category || category === 'all' ? 'Todas las Joyas' :
-             category.charAt(0).toUpperCase() + category.slice(1)}
+              category.charAt(0).toUpperCase() + category.slice(1)}
           </h2>
           <p className="text-elegant-600 font-lato">
             {filteredAndSortedProducts.length} productos encontrados
@@ -129,21 +129,19 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
           <div className="flex items-center border border-elegant-300 rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 transition-colors ${
-                viewMode === 'grid' 
-                  ? 'bg-gold-500 text-white' 
+              className={`p-2 transition-colors ${viewMode === 'grid'
+                  ? 'bg-gold-500 text-white'
                   : 'text-elegant-600 hover:bg-elegant-100'
-              }`}
+                }`}
             >
               <Grid3X3 className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 transition-colors ${
-                viewMode === 'list' 
-                  ? 'bg-gold-500 text-white' 
+              className={`p-2 transition-colors ${viewMode === 'list'
+                  ? 'bg-gold-500 text-white'
                   : 'text-elegant-600 hover:bg-elegant-100'
-              }`}
+                }`}
             >
               <List className="h-5 w-5" />
             </button>
@@ -178,7 +176,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
           <h3 className="text-lg font-playfair font-semibold text-elegant-900 mb-4">
             Filtros Avanzados
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Price Range */}
             <div>
@@ -295,15 +293,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products: productsProp, categ
           </button>
         </div>
       ) : (
-        <div className={`${
-          viewMode === 'grid'
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+        <div className={`${viewMode === 'grid'
+            ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'
             : 'space-y-6'
-        }`}>
+          }`}>
           {filteredAndSortedProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
+            <ProductCard
+              key={product.id}
+              product={product}
               onQuickView={handleQuickView}
             />
           ))}
