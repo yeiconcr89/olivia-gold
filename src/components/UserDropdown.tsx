@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, ShoppingBag, Heart, ChevronDown } from 'lucide-react';
 
 interface UserData {
@@ -16,6 +17,7 @@ interface UserDropdownProps {
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({ user, onLogout, authMethod }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +114,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onLogout, authMethod 
             ) : null}
 
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                navigate('/orders');
+              }}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <ShoppingBag className="w-4 h-4 mr-3" />
@@ -120,7 +125,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onLogout, authMethod 
             </button>
 
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                navigate('/wishlist');
+              }}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <Heart className="w-4 h-4 mr-3" />
@@ -128,7 +136,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onLogout, authMethod 
             </button>
 
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                navigate('/profile');
+              }}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <User className="w-4 h-4 mr-3" />

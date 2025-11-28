@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Product } from '../types';
 
 interface WishlistContextType {
-  wishlist: string[];
-  addToWishlist: (productId: string) => void;
+  wishlist: Product[];
+  addToWishlist: (product: Product) => void;
   removeFromWishlist: (productId: string) => void;
-  toggleWishlist: (productId: string) => void;
+  toggleWishlist: (product: Product) => void;
   isInWishlist: (productId: string) => boolean;
 }
 
@@ -23,7 +24,7 @@ interface WishlistProviderProps {
 }
 
 export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) => {
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [wishlist, setWishlist] = useState<Product[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Cargar wishlist desde localStorage al inicializar
@@ -48,11 +49,11 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
   }, [wishlist, isInitialized]);
 
-  const addToWishlist = (productId: string) => {
+  const addToWishlist = (product: Product) => {
     setWishlist(prev => {
-      if (!prev.includes(productId)) {
+      if (!prev.some(item => item.id === product.id)) {
         console.log('Producto agregado a favoritos');
-        return [...prev, productId];
+        return [...prev, product];
       }
       return prev;
     });
@@ -60,21 +61,21 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const removeFromWishlist = (productId: string) => {
     setWishlist(prev => {
-      const newWishlist = prev.filter(id => id !== productId);
+      const newWishlist = prev.filter(item => item.id !== productId);
       console.log('Producto removido de favoritos');
       return newWishlist;
     });
   };
 
-  const toggleWishlist = (productId: string) => {
-    if (wishlist.includes(productId)) {
-      removeFromWishlist(productId);
+  const toggleWishlist = (product: Product) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
     } else {
-      addToWishlist(productId);
+      addToWishlist(product);
     }
   };
 
-  const isInWishlist = (productId: string) => wishlist.includes(productId);
+  const isInWishlist = (productId: string) => wishlist.some(item => item.id === productId);
 
   const value: WishlistContextType = {
     wishlist,

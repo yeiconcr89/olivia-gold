@@ -15,6 +15,9 @@ import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import AdminPage from './pages/AdminPage';
 import ProductDebug from './pages/ProductDebug';
+import OrdersPage from './pages/OrdersPage';
+import WishlistPage from './pages/WishlistPage';
+import ProfilePage from './pages/ProfilePage';
 
 // Componentes principales
 import Header from './components/Header';
@@ -114,7 +117,25 @@ const App: React.FC = () => {
                   <Route path="/cuidado-joyas" element={<JewelryCarePage />} />
                   <Route path="/garantia" element={<WarrantyPage />} />
                   <Route path="/terminos-condiciones" element={<TermsPage />} />
+                  <Route path="/terminos-condiciones" element={<TermsPage />} />
                   <Route path="/politica-privacidad" element={<PrivacyPage />} />
+
+                  {/* User Pages */}
+                  <Route path="/orders" element={
+                    <ErrorBoundary>
+                      <OrdersPage />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/wishlist" element={
+                    <ErrorBoundary>
+                      <WishlistPage />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/profile" element={
+                    <ErrorBoundary>
+                      <ProfilePage />
+                    </ErrorBoundary>
+                  } />
 
                   <Route path="*" element={
                     <div className="container py-16 text-center">

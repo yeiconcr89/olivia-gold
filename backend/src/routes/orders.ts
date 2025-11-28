@@ -60,8 +60,8 @@ const orderQuerySchema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']).optional(),
   paymentStatus: z.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).optional(),
   customerId: z.string().optional().transform(e => e === "" ? undefined : e),
-  startDate: z.string().optional().transform(e => e === "" ? undefined : e),
-  endDate: z.string().optional().transform(e => e === "" ? undefined : e),
+  startDate: z.string().optional().transform(e => e ? new Date(e) : undefined),
+  endDate: z.string().optional().transform(e => e ? new Date(e) : undefined),
   sortBy: z.enum(['orderDate', 'total', 'status', 'customerName']).default('orderDate'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
@@ -75,9 +75,9 @@ const orderQuerySchema = z.object({
  * @desc    Obtener estadísticas de pedidos
  * @access  Private (Admin/Manager)
  */
-router.get('/stats/overview', 
-  authenticate, 
-  authorize(['ADMIN', 'MANAGER']), 
+router.get('/stats/overview',
+  authenticate,
+  authorize(['ADMIN', 'MANAGER']),
   async (req: Request, res: Response) => {
     try {
       const stats = await orderService.getOrderOverviewStats();
@@ -98,7 +98,7 @@ router.get('/stats/overview',
  * @desc    Obtener lista de pedidos con filtros y paginación
  * @access  Private (Admin)
  */
-router.get('/', 
+router.get('/',
   authenticate,
   authorize(['ADMIN', 'MANAGER']),
   validateQuery(orderQuerySchema),
@@ -173,7 +173,7 @@ router.delete('/:id',
  * @desc    Crear nuevo pedido
  * @access  Public
  */
-router.post('/', 
+router.post('/',
   orderCreationLimiter,
   validate(createOrderSchema),
   async (req: Request, res: Response) => {
@@ -207,6 +207,31 @@ router.get('/:id',
     } catch (error) {
       logger.error('Error obteniendo pedido:', error);
       throw error; // Re-lanzar el error para que sea capturado por el middleware
+    }
+  }
+);
+
+/**
+ * @route   GET /api/orders/my-orders
+ * @desc    Obtener pedidos del usuario autenticado
+ * @access  Private
+ */
+router.get('/my-orders',
+  authenticate,
+  async (req: Request, res: Response) => {
+    try {
+      // El middleware authenticate añade el usuario a req.user
+      const userEmail = (req as any).user?.email;
+
+      if (!userEmail) {
+        return res.status(401).json({ message: 'Usuario no autenticado' });
+      }
+
+      const orders = await orderService.getOrdersByCustomer(userEmail);
+      res.json(orders);
+    } catch (error) {
+      logger.error('Error obteniendo mis pedidos:', error);
+      throw error;
     }
   }
 );

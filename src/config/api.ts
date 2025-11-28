@@ -35,6 +35,7 @@ export const API_CONFIG = {
     // Order endpoints
     ORDERS: {
       LIST: `${API_BASE_URL}/api/orders`,
+      MY_ORDERS: `${API_BASE_URL}/api/orders/my-orders`,
       CREATE: `${API_BASE_URL}/api/orders`,
       GET: (id: string) => `${API_BASE_URL}/api/orders/${id}`,
       UPDATE: (id: string) => `${API_BASE_URL}/api/orders/${id}`,

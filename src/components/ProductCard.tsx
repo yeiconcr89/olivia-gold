@@ -30,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleWishlist(product.id);
+    toggleWishlist(product);
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -80,8 +80,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
         <button
           onClick={handleToggleWishlist}
           className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 backdrop-blur-sm ${isInWishlist(product.id)
-              ? 'bg-amber-500/90 text-white shadow-lg'
-              : 'bg-white/90 text-gray-700 hover:bg-white'
+            ? 'bg-amber-500/90 text-white shadow-lg'
+            : 'bg-white/90 text-gray-700 hover:bg-white'
             } hover:scale-110 shadow-md`}
           aria-label="Wishlist"
         >

@@ -164,11 +164,11 @@ const formatOrderResponse = (order: any) => {
 
 export const createOrder = async (orderData: CreateOrderData) => {
   console.log('🛒 createOrder llamado con datos:', JSON.stringify(orderData, null, 2));
-  
+
   const order = await prisma.$transaction(async (tx) => {
     // 1. Buscar o crear customer si no se proporciona customerId
     let customerId = orderData.customerId;
-    
+
     if (!customerId) {
       // Buscar customer existente por email
       let customer = await tx.customer.findUnique({
@@ -202,7 +202,7 @@ export const createOrder = async (orderData: CreateOrderData) => {
           logger.info(`Customer actualizado: ${customer.id} - ${customer.email}`);
         }
       }
-      
+
       customerId = customer.id;
     }
 
@@ -237,7 +237,7 @@ export const createOrder = async (orderData: CreateOrderData) => {
     // 4. Preparar items del pedido y usar el total del carrito
     const orderItems = orderData.items.map(item => {
       const product = products.find(p => p.id === item.productId);
-      
+
       return {
         productId: item.productId,
         quantity: item.quantity,
@@ -245,13 +245,13 @@ export const createOrder = async (orderData: CreateOrderData) => {
         size: item.size,
       };
     });
-    
+
     // Usar el total calculado del carrito
     const total = orderData.total;
 
     // 5. Generar número de pedido único
     const orderNumber = await generateOrderNumber();
-    
+
     // 6. Crear el pedido
     const newOrder = await tx.order.create({
       data: {
@@ -315,7 +315,7 @@ export const createOrder = async (orderData: CreateOrderData) => {
     return newOrder;
   });
 
-    logger.debug('Order object before formatting in createOrder:', JSON.stringify(order, null, 2));
+  logger.debug('Order object before formatting in createOrder:', JSON.stringify(order, null, 2));
   return formatOrderResponse(order);
 };
 
@@ -600,4 +600,31 @@ export const getOrderOverviewStats = async () => {
       total: Number(order.total),
     })),
   };
+};
+
+export const getOrdersByCustomer = async (email: string) => {
+  const orders = await prisma.order.findMany({
+    where: {
+      customerEmail: email,
+    },
+    include: {
+      items: {
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              images: true,
+            },
+          },
+        },
+      },
+      shippingAddress: true,
+    },
+    orderBy: {
+      orderDate: 'desc',
+    },
+  });
+
+  return orders.map(order => formatOrderResponse(order));
 };

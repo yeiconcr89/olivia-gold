@@ -27,23 +27,28 @@ export interface Order {
   customerId: string;
   customerName: string;
   customerEmail: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   total: number;
   items: OrderItem[];
   shippingAddress: Address;
   paymentMethod: string;
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   notes?: string;
+  orderDate: string;
+  trackingNumber?: string;
+  estimatedDelivery?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface OrderItem {
+  id: string;
   productId: string;
   productName: string;
   quantity: number;
   price: number;
-  image?: string;
+  productImage?: string;
+  size?: string;
 }
 
 // Tipos para usuarios y autenticación
