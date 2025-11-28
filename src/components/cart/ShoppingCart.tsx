@@ -215,6 +215,7 @@ ${itemsText}
 \u{1F4B0} *Resumen:*
 *Subtotal:* ${formatCurrency(cart.subtotal)}
 ${cart.discountAmount > 0 ? `*Descuento:* -${formatCurrency(cart.discountAmount)}\n` : ''}*Envío:* ${cart.shippingAmount === 0 ? 'Gratis' : formatCurrency(cart.shippingAmount)}
+*Impuestos:* ${formatCurrency(cart.taxAmount || 0)}
 *Total:* ${total}
 
 \u{1F4CB} *Mis datos de contacto:*
